@@ -257,6 +257,14 @@ public class TapHeader {
     
     /**
      * 
+     * @return velikost celé hlavičky v bytech
+     */
+    public int getSize() {
+        return data.length;
+    }
+    
+    /**
+     * 
      * @param value
      * @return 
      */

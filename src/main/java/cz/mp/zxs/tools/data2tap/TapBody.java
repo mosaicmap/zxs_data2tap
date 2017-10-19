@@ -30,6 +30,9 @@ public class TapBody {
     /** index dalšího volného bytu v data */
     private int idx;    
     
+    /** délka samotných dat. */
+    private int dataOnlySize;
+    
     private byte parity = flag;    // počítá se
     
     /**
@@ -43,6 +46,7 @@ public class TapBody {
         if (size < 1 || size > (ZxsConstants.RAM_SIZE__48K-1)) {
             throw new IllegalArgumentException("size");
         }
+        dataOnlySize = size;
         int len = size + 2;  // 2 za flag a parity
         lenLsb = (byte) (len & 0xFF);
         lenMSB = (byte) ((len >> 8) & 0xFF);
@@ -87,7 +91,7 @@ public class TapBody {
         }
         data[idx] = parity;
     }
-    
+        
     /**
      * Získá obsah datového bloku TAP.
      * Před zavoláním této metody je třeba zavolat metodu {@link #appendParityToLastByte()},
@@ -100,4 +104,20 @@ public class TapBody {
         return data;
     }    
     
+    /**
+     * 
+     * @return velikost celého těla v bytech
+     * @see #getDataSize() 
+     */
+    public int getSize() {
+        return data.length;
+    }    
+    
+    /**
+     * 
+     * @return délka samotných dat
+     */
+    public int getDataSize() {
+        return dataOnlySize;
+    }
 }   // TapData.java
