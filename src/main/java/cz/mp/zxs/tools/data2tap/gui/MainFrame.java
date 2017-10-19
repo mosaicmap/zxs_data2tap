@@ -679,7 +679,9 @@ public class MainFrame {
             fos.flush();
 
             JOptionPane.showMessageDialog(frame,
-                    "<HTML><B>" + outTapFile.getName() + "</B> successfully created.", 
+                    "<HTML><B>" + outTapFile.getName() + "</B> successfully created.<BR>"
+                    + "Data size = " + tapBody.getDataSize() + " B.<br>"
+                    + "File size = " + (tapHeader.getSize() + tapBody.getSize()) + " B.",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
             return true;            
