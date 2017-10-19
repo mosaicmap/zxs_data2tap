@@ -34,9 +34,12 @@ public class FileDialogBuilder {
         
         ExtFileFilter scrExtFileFilter = new ExtFileFilter("ZX Spectrum SCREEN$ image", "scr");
         fileChooser.addChoosableFileFilter(scrExtFileFilter);
+        ExtFileFilter binExtFileFilter = new ExtFileFilter("Binary file", "bin");
+        fileChooser.addChoosableFileFilter(binExtFileFilter);
+
         fileChooser.setFileFilter(scrExtFileFilter);
         fileChooser.setCurrentDirectory(new File("."));
-
+        
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);        
         fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
