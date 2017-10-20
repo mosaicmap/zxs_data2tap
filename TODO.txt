@@ -1,2 +1,11 @@
 
 
+? CLI
+    -a adress_0x4000-0xFFFE
+    -n name_max_10_chars
+    --ibf input_binary_file
+    --itdf input_text_file with data in decimal radix
+    --ithdf input_text_file with data in hexadecimal radix
+    -o output.tap
+    -t typ (default 3)
+
