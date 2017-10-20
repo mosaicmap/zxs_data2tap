@@ -64,7 +64,7 @@ You can assemble your program into TAP following these steps:
     - your favorite image editor (for example *GIMP*). Export image to PNG and then convert result to SCR with *[png2scr](https://github.com/reidrac/png2scr)*. Good  for simple loading screens.    
     - ...    
 
-  Save file as *loading_screen.scr*.
+    Save file as *loading_screen.scr*.
 
 4. wrap *loading_screen.scr* to TAP using **zxs_data2tap**.
 
@@ -93,18 +93,18 @@ You can assemble your program into TAP following these steps:
     - udg_data.tap
     - main_basic_program.tap
 
-  Finally merge all parts using command:
+    Finally merge all parts using command:
 
     - on Unix-like system:
-      ```
-      $ cat basic_loader.tap loading_screen.tap data_udg.tap main_basic_program.tap > my_program_for_zxs.tap
-      ```    
+    ```
+    $ cat basic_loader.tap loading_screen.tap data_udg.tap main_basic_program.tap > my_program_for_zxs.tap
+    ```    
     - on MS Windows:
-      ```
-      > copy /b basic_loader.tap + loading_screen.tap + data_udg.tap + main_basic_program.tap  my_program_for_zxs.tap
-      ```
+    ```
+    > copy /b basic_loader.tap + loading_screen.tap + data_udg.tap + main_basic_program.tap  my_program_for_zxs.tap
+    ```
 
-  Result is *my_program_for_zxs.tap*
+    Result is *my_program_for_zxs.tap*
 
 9. Test the *my_program_for_zxs.tap* in your ZX Spectrum emulator       
 
