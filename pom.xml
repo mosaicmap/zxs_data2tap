@@ -4,7 +4,7 @@
     
     <groupId>cz.mp.zxs.tools.data2tap</groupId>
     <artifactId>zxs_data2tap</artifactId>
-    <version>0.1_DEVEL</version>
+    <version>0.1</version>
     <name>zxs_data2tap</name>
     
     <packaging>jar</packaging>
