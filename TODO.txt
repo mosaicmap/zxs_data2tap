@@ -1,11 +1,35 @@
 
 
-? CLI
-    -a adress_0x4000-0xFFFE
-    -n name_max_10_chars
-    --ibf input_binary_file
-    --itdf input_text_file with data in decimal radix
-    --ithdf input_text_file with data in hexadecimal radix
-    -o output.tap
-    -t typ (default 3)
 
+- projekt
+
+    src/resources/res4dist  -> src/res4dist
+    a upravit pom.xml a assembly.xml 
+
+- GUI
+    - popisky
+        3: binary data
+
+    - adresa  
+        možnost zadávat  dec a hex
+        volby s nápovědou v dec      
+    
+    - zobrazovat velikost dat v poli data
+      jako label nebo needitovatelný field
+
+- přidělat CLI
+
+    --help
+    --version
+
+    --gui
+    
+    -a adress
+        - kontrola  0x4000-0xFFFE
+    -s title
+        - kontrola  max 10 znaků
+    -i input_binary_file 
+    -o out_tap_file
+
+
+    + spouštěcí skript bude otevírat GUI
