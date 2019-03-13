@@ -29,35 +29,37 @@ public class Main {
         log = LoggerFactory.getLogger(Main.class);
     }
     
-    /** */
-    private static void printVersion() {
-        System.out.println(VERSION);
-    }
+//    /** */
+//    private static void printVersion() {
+//        System.out.println(VERSION);
+//    }
 
     /** */
     public static void main(String[] args) {
         log.info("version: " + VERSION);
 
-        boolean optVersion = false;
+//        boolean optVersion = false;
+//
+//        for(int i = 0; i < args.length; i++) {
+//            String opt = args[i].trim().toLowerCase();
+//            if (opt.equals("--version")) {
+//                optVersion = true;
+//            }
+//        }
+//        if (optVersion) {
+//            printVersion();
+//            System.exit(0);
+//        }
+//
+//        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                log.info("create and show GUI");
+//                MainFrame.getInstance().setVisible(true);
+//            }
+//        });
 
-        for(int i = 0; i < args.length; i++) {
-            String opt = args[i].trim().toLowerCase();
-            if (opt.equals("--version")) {
-                optVersion = true;
-            }
-        }
-        if (optVersion) {
-            printVersion();
-            System.exit(0);
-        }
-
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                log.info("create and show GUI");
-                MainFrame.getInstance().setVisible(true);
-            }
-        });
+        new Data2tapCli().executeWithArgs(args);
     }
 
 }   // Main.java

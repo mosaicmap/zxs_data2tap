@@ -20,7 +20,7 @@ public class TapHeaderTest {
     @Test
     public void testTapHeader() {
         TapHeader tapHeader = new TapHeader();
-        tapHeader.setType(TapBlockType.CODE_OR_SCREEN);
+        tapHeader.setType(TapBlockType.BINARY_DATA);
         tapHeader.setName("test");
         tapHeader.setParam1(0x4000);
         tapHeader.setDataLength(128);
@@ -47,7 +47,7 @@ public class TapHeaderTest {
     @Test(expected = IllegalStateException.class)
     public void testTapHeaderNoFinishErr() {
         TapHeader tapHeader = new TapHeader();
-        tapHeader.setType(TapBlockType.CODE_OR_SCREEN);
+        tapHeader.setType(TapBlockType.BINARY_DATA);
         tapHeader.setName("test");
         tapHeader.setParam1(0x4000);
         tapHeader.setDataLength(128);

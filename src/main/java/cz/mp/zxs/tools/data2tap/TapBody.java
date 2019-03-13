@@ -26,49 +26,62 @@ public class TapBody {
     private byte lenMSB;
     private byte flag = FLAG_DATA;
     
-    private byte[] data = new byte[]{};
+    private byte[] bodyData = new byte[]{};
     /** index dalšího volného bytu v data */
     private int idx;    
     
     /** délka samotných dat. */
-    private int dataOnlySize;
+    private int rawDataSize;
     
     private byte parity = flag;    // počítá se
     
     /**
      * 
-     * @param size  délka samotných dat. 
+     * @param rawDataSize  délka samotných dat v bytech. 
      *      Nezapočítává se flag,parita,délka bloku.
      *      ({@code 1 až (48KiB-1)} (viz {@linkplain ZxsConstants#RAM_SIZE__48K}))
      * @throws IllegalArgumentException
+     * @see #append(byte...) 
+     * @see #append(byte) 
+     * @see #appendParityToLastByte()
      */
-    public TapBody(int size) {
-        if (size < 1 || size > (ZxsConstants.RAM_SIZE__48K-1)) {
-            throw new IllegalArgumentException("size");
-        }
-        dataOnlySize = size;
-        int len = size + 2;  // 2 za flag a parity
-        lenLsb = (byte) (len & 0xFF);
-        lenMSB = (byte) ((len >> 8) & 0xFF);
-        int dataLen = size + 4;  // 2 za len, 2 za flag a parity
-        data = new byte[dataLen];
-        idx = 0;
-        data[idx++] = lenLsb;
-        data[idx++] = lenMSB;
-        data[idx++] = flag;
+    public TapBody(int rawDataSize) {
+        initImpl(rawDataSize);
     }
 
+    /**
+     * 
+     * @param rawDataSize  délka samotných dat v bytech. 
+     *      Nezapočítává se flag,parita,délka bloku.
+     * @throws IllegalArgumentException
+     */
+    private void initImpl(int rawDataSize) {
+        if (rawDataSize < 1) {
+            throw new IllegalArgumentException("rawDataSize");
+        }
+        this.rawDataSize = rawDataSize;
+        int len = rawDataSize + 2;  // 2 za flag a parity
+        lenLsb = (byte) (len & 0xFF);
+        lenMSB = (byte) ((len >> 8) & 0xFF);
+        int bodyLen = rawDataSize + 4;  // 2 za len, 1 za flag, 1 za paritu
+        bodyData = new byte[bodyLen];
+        idx = 0;
+        bodyData[idx++] = lenLsb;
+        bodyData[idx++] = lenMSB;
+        bodyData[idx++] = flag;
+    }
+    
     /**
      * 
      * @param value 
      */
     public void append(byte value) {
-        data[idx++] = value;
+        bodyData[idx++] = value;
         parity ^= value;
     }
     
     public boolean isFull() {
-        return idx >= data.length-1;    // (poslední pozice je pro paritu)
+        return idx >= bodyData.length-1;    // (poslední pozice je pro paritu)
     }
 
     /**
@@ -77,7 +90,7 @@ public class TapBody {
      */
     public void append(byte... values) {
         for(int i=0; i<values.length; i++) {
-            data[idx++] = values[i];
+            bodyData[idx++] = values[i];
             parity ^= values[i];            
         }
     }
@@ -86,10 +99,10 @@ public class TapBody {
      * 
      */
     public void appendParityToLastByte() {
-        if (data.length == 0) {
+        if (bodyData.length == 0) {
             throw new IllegalStateException("data");
         }
-        data[idx] = parity;
+        bodyData[idx] = parity;
     }
         
     /**
@@ -101,23 +114,23 @@ public class TapBody {
      * @see #appendParityToLastByte()
      */
     public byte[] getBytes() {
-        return data;
+        return bodyData;
     }    
     
     /**
      * 
      * @return velikost celého těla v bytech
-     * @see #getDataSize() 
+     * @see #getRawDataSize() 
      */
-    public int getSize() {
-        return data.length;
+    public int getBodySize() {
+        return bodyData.length;
     }    
     
     /**
      * 
      * @return délka samotných dat
      */
-    public int getDataSize() {
-        return dataOnlySize;
+    public int getRawDataSize() {
+        return rawDataSize;
     }
 }   // TapData.java

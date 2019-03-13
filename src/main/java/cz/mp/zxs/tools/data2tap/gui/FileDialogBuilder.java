@@ -37,7 +37,6 @@ public class FileDialogBuilder {
         ExtFileFilter binExtFileFilter = new ExtFileFilter("Binary file", "bin");
         fileChooser.addChoosableFileFilter(binExtFileFilter);
 
-        fileChooser.setFileFilter(scrExtFileFilter);
         fileChooser.setCurrentDirectory(new File("."));
         
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);        

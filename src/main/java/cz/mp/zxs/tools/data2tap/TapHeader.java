@@ -27,8 +27,12 @@ public class TapHeader {
     
     public static final byte FLAG_HEADER = 0;
     
-    public static final int PARAM_1_MIN_VALUE_FOR_CODE = 0x4000;    // 0x4000 = 16384
-    public static final int PARAM_2_CODE_FLAG = 0x8000;         // 0x8000 = 32768
+    public static final int PARAM_1_MAX_VALUE = 0xFFFF;    // (2B celé číslo)
+    public static final int PARAM_1_MIN_VALUE_FOR_CODE = 
+            MemoryAddress.ZXS_RAM_BEGINING.getAddress(); // 16384; // 0x4000
+    
+    public static final int PARAM_2_MAX_VALUE = 0xFFFF;    // (2B celé číslo)
+    public static final int PARAM_2_CODE_FLAG = 32768; // 0x8000
     
     // délka bez lenLsb a lenMSB
     private byte lenLsb = (byte)HEADER_DEFAULT_SIZE;
@@ -37,31 +41,39 @@ public class TapHeader {
     private byte flag = FLAG_HEADER;
     private TapBlockType type;  // 1B
     
+    /** Jméno v hlavičce. Vždy je 10 znaků. Doplňuje se mezerami zprava. */
     private String name;
     
     private int dataLen;
     private byte dataLenLsb;
     private byte dataLenMSB;
     
+    /** Param 2 má být pro blok typu 3 adresa v RAM, kam se mají vložit 
+     * binární data. */
     private int param1;
     private byte param1Lsb;
     private byte param1MSB;
     
+    /** Param 2 má být pro blok typu 3 vždy = 32768. 
+     * @see #PARAM_1_MIN_VALUE_FOR_CODE */
     private int param2;
     private byte param2Lsb;
     private byte param2MSB;
     
-    private byte parity;    // počítá se
-    
+    /** Parita. Počítá se jako XOR přes všechy byty... viz níže. */
+    private byte parity;
+
     private byte[] data = new byte[]{};
-            
+
+    private ZxModel zxModel = ZxModelSpectrum48k.get();
+    
     // -----
     public TapHeader() {
     }
 
     /**
      * 
-     * @param type  (pokud je {@linkplain TapBlockType#CODE_OR_SCREEN},
+     * @param type  (pokud je {@link TapBlockType#BINARY_DATA},
      *      potom se nastaví i param2
      */
     public TapHeader(TapBlockType type) {
@@ -70,7 +82,7 @@ public class TapHeader {
         
     /**
      * 
-     * @param type  (pokud je {@linkplain TapBlockType#CODE_OR_SCREEN},
+     * @param type  (pokud je {@link TapBlockType#BINARY_DATA},
      *      potom se nastaví i param2
      */
     public void setType(TapBlockType type) {
@@ -79,7 +91,7 @@ public class TapHeader {
     
     /**
      * 
-     * @param type  (pokud je {@linkplain TapBlockType#CODE_OR_SCREEN},
+     * @param type  (pokud je {@link TapBlockType#BINARY_DATA},
      *      potom se nastaví i param2
      */
     private void setTypeImpl(TapBlockType type) {
@@ -88,7 +100,7 @@ public class TapHeader {
         }
         this.type = type;
         
-        if (type == TapBlockType.CODE_OR_SCREEN) {
+        if (type == TapBlockType.BINARY_DATA) {
             setParam2Impl(PARAM_2_CODE_FLAG);
         }
     }
@@ -155,8 +167,9 @@ public class TapHeader {
      * @throws IllegalArgumentException
      */
     public void setDataLength(int length) {
-        if (length < 0 || length > ZxsConstants.ADR_MAX__48K) {
-            throw new IllegalArgumentException("length");
+        if (length < 0 || length > zxModel.getRamSize()) {
+            log.debug("length = " + length);
+            throw new IllegalArgumentException("illegal data length");
         }
         this.dataLen = length;
         dataLenLsb = get16bitLsb(length);
@@ -169,10 +182,10 @@ public class TapHeader {
      * @throws IllegalArgumentException
      */
     public void setParam1(int param1) {
-        if (param1 < 0 || param1 > ZxsConstants.ADR_MAX__48K) {
-            throw new IllegalArgumentException("param1");
+        if (param1 < 0 || param1 > PARAM_1_MAX_VALUE) {
+            throw new IllegalArgumentException("illegal param1");
         }
-        if (type == TapBlockType.CODE_OR_SCREEN) {
+        if (type == TapBlockType.BINARY_DATA) {
             if (param1 < PARAM_1_MIN_VALUE_FOR_CODE) {
                 throw new IllegalArgumentException("param1 < PARAM_1_MIN_VALUE_FOR_CODE");
             }
@@ -197,12 +210,23 @@ public class TapHeader {
      * @throws IllegalArgumentException
      */
     private void setParam2Impl(int param2) {
-        if (param2 < 0 || param2 > ZxsConstants.ADR_MAX__48K) {
-            throw new IllegalArgumentException("param2");
+        if (param2 < 0 || param2 > PARAM_2_MAX_VALUE) {
+            throw new IllegalArgumentException("illegal param2");
         }
         this.param2 = param2;
         param2Lsb = get16bitLsb(param2);
         param2MSB = get16bitMSB(param2);        
+    }
+
+    /**
+     * 
+     * @param zxModel 
+     */
+    public void setZxModel(ZxModel zxModel) {
+        if (zxModel == null) {
+            throw new IllegalArgumentException("zxModel");
+        }
+        this.zxModel = zxModel;
     }
     
     /**
@@ -210,14 +234,14 @@ public class TapHeader {
      * @throws IllegalStateException
      */
     public void createData() {
-        if (dataLen < 0 || dataLen > ZxsConstants.ADR_MAX__48K) {
-            throw new IllegalStateException("dataLen");
+        if (dataLen < 0 || dataLen > zxModel.getRamSize()) {
+            throw new IllegalStateException("illegal dataLen");
         }
-        if (param1 < 0 || param1 > ZxsConstants.ADR_MAX__48K) {
-            throw new IllegalStateException("param1");
+        if (param1 < 0 || param1 > PARAM_1_MAX_VALUE) {
+            throw new IllegalStateException("illegal param1");
         }
-        if (param2 < 0 || param2 > ZxsConstants.ADR_MAX__48K) {
-            throw new IllegalStateException("param2");
+        if (param2 < 0 || param2 > PARAM_2_MAX_VALUE) {
+            throw new IllegalStateException("illegal param2");
         }
         
         data = new byte[HEADER_DEFAULT_SIZE + 2];    // +2 je za lenLsb a lenMSB

@@ -7,17 +7,18 @@
 
 package cz.mp.zxs.tools.data2tap.gui;
 
+import cz.mp.zxs.tools.data2tap.Data2tap;
+import cz.mp.zxs.tools.data2tap.Data2tapCli;
 import cz.mp.zxs.tools.data2tap.utils.GuiUtils;
 import cz.mp.zxs.tools.data2tap.InvalidDataException;
+import cz.mp.zxs.tools.data2tap.MemoryAddress;
 import cz.mp.zxs.tools.data2tap.TapBlockType;
-import cz.mp.zxs.tools.data2tap.TapBody;
-import cz.mp.zxs.tools.data2tap.TapHeader;
 import cz.mp.zxs.tools.data2tap.Version;
-import cz.mp.zxs.tools.data2tap.ZxsConstants;
-import static cz.mp.zxs.tools.data2tap.ZxsConstants.ADR_MAX__48K;
+import cz.mp.zxs.tools.data2tap.ZxModel;
+import cz.mp.zxs.tools.data2tap.ZxModelSpectrum16k;
+import cz.mp.zxs.tools.data2tap.ZxModelSpectrum48k;
 import cz.mp.zxs.tools.data2tap.gui.component.LabelBold;
 import cz.mp.zxs.tools.data2tap.utils.FileUtils;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -35,12 +36,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.util.ArrayList;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
@@ -48,7 +47,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -81,16 +79,23 @@ public class MainFrame {
 
     private static MainFrame instance = null;
 
-    private LabelBold nameLabel = new LabelBold("Name");
-    private JFormattedTextField nameField = new JFormattedTextField();
+    private LabelBold modelLabel = new LabelBold("Model");
+    private JComboBox modelCombo = new JComboBox();
 
+    private ZxModel selectedZxModel;
+        
     private LabelBold typeLabel = new LabelBold("Type");
     private JComboBox typeCombo = new JComboBox();
 
-    private LabelBold adressLabel = new LabelBold("Adress");
-    private JComboBox adressCombo = new JComboBox();
+    private LabelBold nameLabel = new LabelBold("Name");
+    private JFormattedTextField nameField = new JFormattedTextField();
+
+    private LabelBold addressLabel = new LabelBold("Address");
+    private JComboBox addressCombo = new JComboBox();
+//    private JLabel adressInfoLabel = new JLabel("16384 (0x4000) \u2013 65535 (0xFFFF)");
 
     private LabelBold dataLabel = new LabelBold("Data");
+//    private JLabel dataLabel = new JLabel("Data");
 
     private JEditorPane dataTextArea = new JEditorPane();
     private JScrollPane dataScrollPane = new JScrollPane(dataTextArea);
@@ -113,6 +118,7 @@ public class MainFrame {
 
     private JFileChooser saveTapFileChooser = null;
     
+    private Data2tap data2tap = new Data2tap();
     
     // -----
     /** */
@@ -126,9 +132,13 @@ public class MainFrame {
             initEventHandlers();
             initFrame();
             nameField.requestFocusInWindow();
-            log.debug("init done");
+            log.info("init done");
+            log.info("selectedZxModel = " + selectedZxModel.getName());        
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
+            JOptionPane.showMessageDialog(MainFrame.this.frame,
+                    ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     };
 
@@ -151,7 +161,7 @@ public class MainFrame {
         log.debug("");
         frame.pack();
         frame.setMinimumSize(new Dimension(frame.getWidth(), frame.getHeight()));
-        frame.setSize(new Dimension(frame.getWidth(), frame.getHeight()+130));
+        frame.setSize(new Dimension(frame.getWidth(), frame.getHeight() + 130));
 
         frame.setLocationRelativeTo(null);
     }
@@ -159,21 +169,47 @@ public class MainFrame {
     private void initComponents() {
         log.debug("");
 
+//        modelCombo.setToolTipText("Used only for validation at this momemt");
+        modelCombo.setEditable(false);
+        
+        ZxModel zxs16k = ZxModelSpectrum16k.get();
+        modelCombo.addItem(zxs16k);        
+        ZxModel zxs48k = ZxModelSpectrum48k.get();
+        modelCombo.addItem(zxs48k);
+    
+        modelCombo.setSelectedItem(zxs48k);
+        selectedZxModel = zxs48k;
+        
         typeCombo.setEditable(false);
-        typeCombo.addItem(TapBlockType.CODE_OR_SCREEN);    // Nyní JEN TapBlockType.CODE_OR_SCREEN !
+        typeCombo.addItem(TapBlockType.BINARY_DATA);
         
         dataTextArea.setFont(monoBiggerFont);
         dataScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-        adressCombo.addItem(new ValueDescriptionItem("",""));
-        adressCombo.addItem(new ValueDescriptionItem("0x4000","SCREEN$"));
-        adressCombo.addItem(new ValueDescriptionItem("0x5800","SCREEN$ Attribs"));
-        adressCombo.addItem(new ValueDescriptionItem("0x7F58","UDG for ZXS 16k"));
-        adressCombo.addItem(new ValueDescriptionItem("0xFF58","UDG for ZXS 48k"));
-        adressCombo.setSelectedIndex(0);
-        adressCombo.setToolTipText("0x4000 (16384) \u2013 0xFFFF (65535)");
-        adressCombo.setEditable(true);
-        adressCombo.setRenderer(new ValueDescriptionCellRenderer());
+//            ZXS 48k
+//        adressCombo.addItem(new MemoryAddressItem("16384","0x4000  Screen memory"));    // 6912 B; 6144 B bez atributů
+//        adressCombo.addItem(new MemoryAddressItem("22528","0x5800  Screen memory Attributes"));  // 768 B
+//      23552  (0x5C00 - System variables  182 B ? -- nesahat  
+//      23734 (0x5CB6) - Microdrive maps 
+//        adressCombo.addItem(new MemoryAddressItem("23296","0x5B00  Printer Buffer"));    // 256 B;  konec na 23552 0x5C00
+//        adressCombo.addItem(new MemoryAddressItem("65368","0xFF58  UDG"));   // 168 B
+                    
+//        adressCombo.addItem(new MemoryAddressItem("",""));
+//        adressCombo.addItem(new MemoryAddressItem("16384","0x4000  Screen memory"));    // 6912 B; 6144 B bez atributů
+//        adressCombo.addItem(new MemoryAddressItem("22528","0x5800  Screen memory Attributes"));  // 768 B
+//        adressCombo.addItem(new MemoryAddressItem("23296","0x5B00  Printer Buffer"));    // 256 B;  konec na 23552 0x5C00
+//        adressCombo.addItem(new MemoryAddressItem("65368","0xFF58  UDG"));   // 168 B
+        
+        addressCombo.addItem("");
+        for (MemoryAddress ma : selectedZxModel.getMemoryAdressSuggestions()) {
+            addressCombo.addItem(ma);
+        }
+        addressCombo.setSelectedIndex(0);
+        
+        addressCombo.setToolTipText("Enter decimal or hexadecimal number. "
+                + "Hexadecimal number i accepted in \"0x\" notation.");
+        addressCombo.setEditable(true);
+        addressCombo.setRenderer(new MemoryAddressCellRenderer());
                 
         try {
             MaskFormatter formatter = new MaskFormatter("**********");
@@ -199,9 +235,9 @@ public class MainFrame {
     private void initAbout() {
         log.debug("");
         // (c) \u00A9 2017 Martin Pokorn\u00FD
-        aboutSelectableLabel.setText(" \u00A9 2017 Martin Pokorn\u00FD"
-                + "   MartinPokorny.czech@gmail.com"
-                + "   Version:" + Version.VERSION_SPEC + " ");
+        aboutSelectableLabel.setText(" \u00A9 2017-2019  Martin Pokorn\u00FD"
+                + "     MartinPokorny.czech@gmail.com"
+                + "     Version:" + Version.VERSION_SPEC + " ");
         aboutSelectableLabel.setOpaque(true);
         aboutSelectableLabel.setEditable(false);
         aboutSelectableLabel.setBackground(null);
@@ -213,6 +249,10 @@ public class MainFrame {
     private void initLayout() {
         log.debug("");
         frame.setLayout (new GridBagLayout());
+
+        Insets insX555 = new Insets(12, 5, 5, 5);
+        Insets insX505 = new Insets(12, 5, 0, 5);
+        Insets insX550 = new Insets(12, 5, 5, 0);
 
         Insets ins5555 = new Insets(5, 5, 5, 5);
         Insets ins5505 = new Insets(5, 5, 0, 5);
@@ -227,6 +267,24 @@ public class MainFrame {
                 GridBagConstraints.WEST, GridBagConstraints.NONE, ins0000, 0,0));
         r++;
 
+        c.add(modelLabel, new GridBagConstraints(0,r,1,1,0.0,0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, insX505, 0,0));
+        c.add(modelCombo, new GridBagConstraints(1,r,1,1,0.0,0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX505, 0,0));
+        r++;
+        // ----
+//        JPanel headerSep = new JPanel(new GridBagLayout());
+//        headerSep.add(headerLabel, new GridBagConstraints(0,0,1,1,0.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.NONE, insX550, 0,0));
+//        headerSep.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(1,0,1,1,1.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0, 0));        
+//        c.add(headerSep, new GridBagConstraints(0,r,11,1,1.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins0000, 0,0));
+//        r++;
+        c.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(0,r,11,1,1.0,0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0,0));
+        r++;
+        
         c.add(typeLabel, new GridBagConstraints(0,r,1,1,0.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, ins5505, 0,0));
         c.add(typeCombo, new GridBagConstraints(1,r,1,1,0.0,0.0,
@@ -239,18 +297,27 @@ public class MainFrame {
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins5505, 0,0));
         r++;
 
-        c.add(adressLabel, new GridBagConstraints(0,r,1,1,0.0,0.0,
+        c.add(addressLabel, new GridBagConstraints(0,r,1,1,0.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, ins5505, 0,0));
-        c.add(adressCombo, new GridBagConstraints(1,r,1,1,0.0,0.0,
+        c.add(addressCombo, new GridBagConstraints(1,r,1,1,0.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins5505, 0,0));
+//        c.add(adressInfoLabel, new GridBagConstraints(2,r,1,1,0.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.NONE, ins5505, 0,0));
         r++;
 
         // ----
+//        JPanel dataSep = new JPanel(new GridBagLayout());
+//        dataSep.add(dataLabel, new GridBagConstraints(0,0,1,1,0.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.NONE, insX550, 0,0));
+//        dataSep.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(1,0,1,1,1.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0, 0));        
+//        c.add(dataSep, new GridBagConstraints(0,r,11,1,1.0,0.0,
+//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins0000, 0,0));
+//        r++;
+        
         c.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(0,r,11,1,1.0,0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, 
-                new Insets(10, 5, 5, 5), 0, 0));
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0,0));
         r++;
-
         c.add(dataLabel, new GridBagConstraints(0,r,1,1,0.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, ins5505, 0,0));
         r++;
@@ -277,7 +344,6 @@ public class MainFrame {
                 new Insets(10, 5, 10, 5), 0,0));
         r++;
 
-
         c.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(0,r,10,1,1.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
                 new Insets(10, 0, 0, 0), 0,0));
@@ -289,8 +355,7 @@ public class MainFrame {
         // ----
         
         // aby měl nameField stejnou velikost (jde mi hlavně o výšku) jako adressCombo
-        //nameField.setMinimumSize(adressCombo.getMinimumSize());
-        nameField.setPreferredSize(adressCombo.getPreferredSize());
+        nameField.setPreferredSize(addressCombo.getPreferredSize());
         //nameField.setSize(adressCombo.getSize());
     }
 
@@ -302,7 +367,7 @@ public class MainFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 log.info("close frame!");
-                System.exit(0);
+                System.exit(Data2tapCli.RESULT_OK);
             }
         });
         
@@ -336,7 +401,21 @@ public class MainFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 log.debug("(createTapBtn click)");
+                
+                // TODO createTapFileWithDialogs -> Data2tap
                 createTapFileWithDialogs();
+            }
+        });
+        
+        modelCombo.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange()==ItemEvent.SELECTED) {
+                    selectedZxModel = getSelectedZxModel();
+                    log.info("selectedZxModel = " + selectedZxModel.getName());
+                    
+                    refreshAddressCombo();
+                }
             }
         });
     }
@@ -356,7 +435,22 @@ public class MainFrame {
         log.info("" + b);
         frame.setVisible(b);
     }
-
+    
+    /**
+     * 
+     * @return 
+     */
+    private ZxModel getSelectedZxModel() {
+        Object selectedItem = modelCombo.getSelectedItem();
+        if (selectedItem instanceof ZxModel) {
+            ZxModel selectedProfile = (ZxModel) selectedItem;
+            return selectedProfile;
+        }
+        else {
+            throw new IllegalStateException("getSelectedProfile");
+        }                    
+    }
+    
     /**
      * 
      * @param origRadix
@@ -406,6 +500,7 @@ public class MainFrame {
         if (radix == Radix.HEXADECIMAL) {
             for(int i=0; i<data.length; i++) {
                 sb.append(String.format("%02X ", (int)(data[i] & 0xFF)));
+                
                 // jen dodatečné formátování pro lepší přehlednost
                 if ((i+1) % 8 == 0) {
                     sb.append(" ");
@@ -421,6 +516,7 @@ public class MainFrame {
         else if (radix == Radix.DECIMAL) {
             for(int i=0; i<data.length; i++) {
                 sb.append(String.format("%d, ", (int)(data[i] & 0xFF)));
+                
                 // jen dodatečné formátování pro lepší přehlednost
                 if ((i+1) % 8 == 0) {
                     sb.append("\n");
@@ -491,7 +587,8 @@ public class MainFrame {
                 }
                 result[i] = (byte) value;
             } catch (NumberFormatException ex) {
-                log.warn(ex.getMessage(), ex);
+                //log.warn(ex.getMessage(), ex);
+                log.warn(ex.getMessage());
                 throw new InvalidDataException("Wrong number: \"" + dataArray[i] + "\"");
             }
         }
@@ -555,13 +652,13 @@ public class MainFrame {
         int fileSize = (int) Files.size(file.toPath());
         log.info("fileSize = " + fileSize);
         
-        if (fileSize > ZxsConstants.RAM_SIZE__48K) {
+        if (fileSize > selectedZxModel.getRamSize()) {
             log.warn(file.getName() 
                     + " is too big (" + fileSize + " B > " 
-                    + ZxsConstants.RAM_SIZE__48K + " B)");
+                    + selectedZxModel.getRamSize() + " B)");
             throw new IOException("File " + file.getName() 
                     + " is too big (" + fileSize + " B > " 
-                    + ZxsConstants.RAM_SIZE__48K + " B)");
+                    + selectedZxModel.getRamSize() + " B)");
         }
             
         Radix selectedRadix = (Radix) dataRadixCombo.getSelectedItem();
@@ -579,27 +676,41 @@ public class MainFrame {
     }
             
     /**
-     * Kontroluje adresu zadanou v {@linkplain #adressCombo}.
+     * Kontroluje adresu zadanou v {@linkplain #addressCombo}.
+     * Pokud je chybně, zobrazí dialog.
      *
      * @return  {@code false}, pokud je zadaná adresa špatně, jinak {@code true}
      * @see #validateAllInputValuesAndShowDialogs() 
      * @see #createTapFileWithDialogs()
      */
     private boolean validateAdressAndShowDialogs() {
-        int adress = 0;
+        int address = 0;
+        if (addressCombo.getSelectedItem().toString().trim().isEmpty()) {
+            log.info("Address is mandatory");
+            JOptionPane.showMessageDialog(MainFrame.this.frame,
+                    "Address is mandatory",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
         try {
-            adress = getSelectedAdress();
-            if (adress < 0x4000 || adress > 0xFFFF) {
-                log.warn("Illegal adress " + adress);
+            address = getSelectedAddress();
+            
+            log.info(" selectedZxModel.isValidAddress(address) = " + selectedZxModel.isValidAddress(address));
+            if (! selectedZxModel.isValidAddress(address)) {
+                log.info("Illegal address " + address);
                 JOptionPane.showMessageDialog(MainFrame.this.frame,
-                        "Adress have to be from 0x4000 to 0xFFFF (from 16384 to 65535)", 
+                        "Address must be from " 
+                        + selectedZxModel.getRamAddresMin() + " to " 
+                        + selectedZxModel.getRamAddresMax(), 
                         "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         } catch (NumberFormatException nex) {
-            log.warn("Wrong adress number. " + nex.getMessage(), nex);
+            //log.warn("Wrong address number. " + nex.getMessage(), nex);
+            log.warn("Wrong address number. " + nex.getMessage());
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Wrong adress number (" + nex.getMessage() + ")",
+                    "Wrong address number (" + nex.getMessage() + ")",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -624,14 +735,7 @@ public class MainFrame {
             
             tapFile = saveTapFileChooser.getSelectedFile();
             log.info("out tapFile = " + tapFile.getAbsolutePath());            
-            //FileFilter selFFilter = saveTapFileChooser.getFileFilter();
-            //log.info("" + selFFilter.toString() + " " + selFFilter.getDescription());
-            //if (selFFilter instanceof ExtFileFilter) {
-            //    ExtFileFilter selExtFF = (ExtFileFilter) selFFilter;
-            //    if (selExtFF.getExtensionsList()[0].equalsIgnoreCase("tap")) {
-            //        // vybrát filt tap souborů
-            //    }
-            //}
+
             // přidat příponu tap, pokud ji soubor nemá
             String ext = FileUtils.getFileExtension(tapFile);
             if (! ext.toLowerCase().equals("tap")) {
@@ -660,40 +764,6 @@ public class MainFrame {
     }
     
     /**
-     * 
-     * @param outTapFile
-     * @param tapHeader
-     * @param tapBody
-     * @return 
-     * @see createTapAndShowDialogs()
-     */
-    private boolean saveOutputTapAndShowDialogs(File outTapFile, 
-            TapHeader tapHeader, TapBody tapBody) {
-        try (
-            FileOutputStream fos = new FileOutputStream(outTapFile);
-            ) {
-
-            fos.write(tapHeader.getBytes());
-            fos.write(tapBody.getBytes());
-
-            fos.flush();
-
-            JOptionPane.showMessageDialog(frame,
-                    "<HTML><B>" + outTapFile.getName() + "</B> successfully created.<BR>"
-                    + "Data size = " + tapBody.getDataSize() + " B.<br>"
-                    + "File size = " + (tapHeader.getSize() + tapBody.getSize()) + " B.",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
-            return true;            
-        } catch (IOException ioex) {
-            log.warn(ioex.getMessage(), ioex);
-            JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    ioex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
-            return false;            
-        }               
-    }
-    
-    /**
      * Ze všech zadaných dat Sestaví TAP soubor.
      * Zobrazí všechny potřebné dialogy.
      */
@@ -711,29 +781,45 @@ public class MainFrame {
         
         if (validateAdressAndShowDialogs() == false) {
             return;
-        }        
-        int adress = getSelectedAdress();
+        }   
+        int address = -1;
+        try {
+            address = getSelectedAddress();
+        } catch (NumberFormatException ex) {
+            log.warn(ex.getMessage());
+            JOptionPane.showMessageDialog(MainFrame.this.frame,
+                    "Adress is not a valid number.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);            
+        }
         
         Radix selectedRadix = (Radix) dataRadixCombo.getSelectedItem();
         
-        byte[] inputData;
+        byte[] inputFileContent;
         try {
-            inputData = parseDataInInputTextArea(selectedRadix);
+            inputFileContent = parseDataInInputTextArea(selectedRadix);
         }
         catch (InvalidDataException idex) {
-            log.warn(idex.getMessage(), idex);
+            //log.warn(idex.getMessage(), idex);
+            log.warn(idex.getMessage());
             JOptionPane.showMessageDialog(MainFrame.this.frame,
                     idex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
             return;
         }
-
-        if (adress + inputData.length > ADR_MAX__48K) {
-            log.warn("adress + inputData.length > ADR_MAX__48K");
+        if (inputFileContent.length == 0) {
+            log.info("No input data");
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Data overflows RAM size (Adress + \"length of data\" > " + ADR_MAX__48K + ")",
+                    "No input data", "Error", JOptionPane.ERROR_MESSAGE);            
+            return;
+        }
+
+        if (address + inputFileContent.length > selectedZxModel.getRamAddresMax()) {
+            log.info("adress + inputData.length > " + selectedZxModel.getRamAddresMax());
+            JOptionPane.showMessageDialog(MainFrame.this.frame,
+                    "Data doesn't fit in RAM  (address + length of data > max address)",
                     "Error", JOptionPane.ERROR_MESSAGE);                                  
             return;
         }
+        
         log.debug("validation finished");
         
         // --- 2. dialog pro zadání výstupního souboru
@@ -741,47 +827,74 @@ public class MainFrame {
         if (outTapFile == null) {
             return;
         }
-
-        // --- 3. připravení obsahu TAP
-        TapHeader tapHeader = new TapHeader();
-        tapHeader.setType((TapBlockType)typeCombo.getSelectedItem());
-        tapHeader.setName(name);
-        tapHeader.setDataLength(inputData.length);
-        tapHeader.setParam1(adress);
-        tapHeader.createData();
-
-        TapBody tapBody = new TapBody(inputData.length);
-        tapBody.append(inputData);
-        tapBody.appendParityToLastByte();
-
-        log.debug("tap prepared");
+                
+        // --- 3. vytvoření TAP souboru        
+        data2tap.setModel(selectedZxModel);
+        data2tap.setTapBlockType((TapBlockType)typeCombo.getSelectedItem());
+        data2tap.setName(name);
+        data2tap.setAddress(address);
+        data2tap.setRawData(inputFileContent);
+        data2tap.setOutTapFile(outTapFile);
         
-        // --- 4. uložení do souboru
-        boolean ok = saveOutputTapAndShowDialogs(outTapFile, tapHeader, tapBody);
-        if (!ok) {
-            return;
+        try {
+            data2tap.execute();
+
+            if (outTapFile.exists() && outTapFile.isFile()) {
+                log.info(outTapFile.getName() + " successfully created");
+                log.info("Data size = " + inputFileContent.length + " B");
+                log.info("File size = " + outTapFile.length() + " B");
+                log.debug("-----------------------");
+                JOptionPane.showMessageDialog(frame,
+                        "<HTML><B>" + outTapFile.getName() + "</B> successfully created.<BR>"
+                        + "Data size = " + inputFileContent.length + " B.<br>"
+                        + "File size = " + outTapFile.length() + " B.",
+                        "Success", JOptionPane.INFORMATION_MESSAGE);                
+            }
+            else {
+                log.warn(outTapFile.getName() + " doesn't exist");
+                JOptionPane.showMessageDialog(MainFrame.this.frame,
+                        "Unexpected failure. See log file for more details.", 
+                        "Error", JOptionPane.ERROR_MESSAGE); 
+            }
+        } catch (InvalidDataException | IOException ex) {
+            log.warn(ex.getMessage(), ex);
+            JOptionPane.showMessageDialog(MainFrame.this.frame,
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
+        } catch (Exception ex) {
+            log.warn(ex.getMessage(), ex);
+            JOptionPane.showMessageDialog(MainFrame.this.frame,
+                    ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-        log.info(outTapFile.getName() + " successfully created");
     }
 
+    /**
+     * Obnoví předvyplněné hodnoty v kombu Address, podle {@linkplain #selectedZxModel}.
+     * 
+     * @see #selectedZxModel
+     */
+    private void refreshAddressCombo() {
+        addressCombo.removeAllItems();
+        addressCombo.addItem("");
+        for (MemoryAddress ma : selectedZxModel.getMemoryAdressSuggestions()) {
+            addressCombo.addItem(ma);
+        }
+        addressCombo.setSelectedIndex(0);
+    }
+    
     /**
      * 
      * @return
      * @throws NumberFormatException 
-     * @see #adressCombo
+     * @see #addressCombo
      */
-    private int getSelectedAdress() throws NumberFormatException {
-        String rawAdress = adressCombo.getSelectedItem().toString().trim();
-        log.debug("rawAdress = " + rawAdress);
-        int adress;
-        if (rawAdress.startsWith("0x")) {
-            adress = Integer.parseInt(rawAdress.substring(2), 16);
-        }
-        else {
-            adress = Integer.parseInt(rawAdress, 10);
-        }
-        log.info("adress = " + adress);
-        return adress;
+    private int getSelectedAddress() throws NumberFormatException {
+        String rawAddress = addressCombo.getSelectedItem().toString().trim();
+        log.debug("rawAdress = " + rawAddress);
+        
+        int address = MemoryAddress.addressToInt(rawAddress);
+        log.info("adress = " + address);
+        
+        return address;
     }
 
     /**
@@ -816,76 +929,6 @@ public class MainFrame {
     }
 
     // -------------------------------------------------------------------------
-    
-    /**
-     * 
-     * @see #adressCombo
-     * @see ValueDescriptionCellRenderer
-     */
-    private class ValueDescriptionItem {
-        private String value;
-        private String description;
-        
-        private ValueDescriptionItem (String value, String description) {
-            this.value = value;
-            this.description = description;
-        }
-
-        public String getValue() {
-            return value;
-        }
-        
-        public String getDescription() {
-            return description;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-    
-    /**
-     * 
-     * @see #adressCombo
-     * @see ValueDescriptionItem
-     */
-    private class ValueDescriptionCellRenderer extends DefaultListCellRenderer {
-
-        @Override
-        public Component getListCellRendererComponent(
-                JList list, Object value,  
-                int index, boolean isSelected, boolean cellHasFocus) {
-
-            Component defaultListCellRenderer = super.getListCellRendererComponent(
-                        list, value, index, isSelected, cellHasFocus);
-
-            if (! (defaultListCellRenderer instanceof JLabel)) {
-                return defaultListCellRenderer;
-            }
-            if (value == null) {
-                return defaultListCellRenderer;
-            }
-            if (! (value instanceof ValueDescriptionItem)) {
-                return defaultListCellRenderer;
-            }            
-            JLabel result = (JLabel) defaultListCellRenderer;
-
-            ValueDescriptionItem valueDesc = (ValueDescriptionItem) value;            
-            if (valueDesc.getDescription().isEmpty()) {
-                result.setText(valueDesc.getValue() + " ");
-            }
-            else {
-                //result.setText(adrVal.getValue() 
-                //        + "  (" + adrVal.getDescription() + ")");                
-                result.setText("<HTML>" + valueDesc.getValue() 
-                        + "  <FONT color=\"GRAY\">(" + valueDesc.getDescription() + ")</font>");
-            }
-                    
-            return result;        
-        }
-    }
-
     /**
      * 
      * @see #dataRadixCombo
@@ -941,7 +984,8 @@ public class MainFrame {
                                     origRadix, newRadix);
                             origRadix = newRadix;
                         } catch (InvalidDataException idex) {
-                            log.warn(idex.getMessage(), idex);
+                            //log.warn(idex.getMessage(), idex);
+                            log.warn(idex.getMessage());
                             JOptionPane.showMessageDialog(MainFrame.this.frame,
                                     idex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         }

@@ -7,8 +7,10 @@
 
 package cz.mp.zxs.tools.data2tap.utils;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 
 
 /**
@@ -37,5 +39,20 @@ public class GuiUtils {
         }
         return label;
     }
+    
+    /**
+     * Vrátí šedavou barvu. 
+     * 
+     * @return 
+     */
+    public static Color getDisabledLabelColor() {
+        if (UIManager.getColor("Label.disabledForeground") != null) {
+            return UIManager.getColor("Label.disabledForeground");
+        }
+        else {
+            return Color.GRAY;
+        }
+    }
+
     
 }   // GuiUtils
