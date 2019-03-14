@@ -4,6 +4,8 @@
 
 - GUI
 
+    - hezčí ikona
+
     ? zobrazovat velikost dat v poli data
       jako label nebo needitovatelný field
 
