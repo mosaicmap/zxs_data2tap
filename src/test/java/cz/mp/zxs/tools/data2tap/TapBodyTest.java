@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class TapBodyTest {
     
     @Test
-    public void testTapBody() {
+    public void testAppendAndAppendParity() {
         TapBody tapBody = new TapBody(8);
         tapBody.append((byte) 0xFE);
         tapBody.append((byte) 0xEF);
@@ -32,7 +32,7 @@ public class TapBodyTest {
         byte[] result = tapBody.getBytes();
                 
         byte[] expected = new byte[]{
-            (byte) 0x0A, (byte) 0x0,  // délka i paritou a flag - lsb,Msb  (= 8 + 2)
+            (byte) 0x0A, (byte) 0x0,  // délka i s paritou a flag - lsb,Msb  (= 8 + 2)
             (byte) 0xFF,    // Flag pro data
             (byte) 0xFE, (byte) 0xEF, (byte) 0x13, (byte) 0x67,
             (byte) 0x67, (byte) 0x67, (byte) 0x67, (byte) 0x67,

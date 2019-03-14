@@ -7,15 +7,13 @@
 
 package cz.mp.zxs.tools.data2tap;
 
-import cz.mp.zxs.tools.data2tap.gui.MainFrame;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+// TODO komentáře
 /**
  * 
  *
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
  */
 public class Data2tap {
 
-    //  TODO test Data2tap ?
-    
     private static final Logger log = LoggerFactory.getLogger(Data2tap.class);
     
     private static final ZxModel DEFAULT_MODEL = ZxModelSpectrum48k.get();
@@ -132,11 +128,11 @@ public class Data2tap {
      */
     private void buildTapHeaderAndBody() throws InvalidDataException {
         if (rawData == null || rawData.length == 0) {
-            throw new IllegalStateException("no data");
+            throw new InvalidDataException("no data");
         }
         log.info("model = " + model.getName());
         if (! this.model.isValidAddress(address)) {
-            throw new IllegalStateException("Address " + address + 
+            throw new InvalidDataException("Address " + address + 
                     " is invalid for " + model.getName());
         }
         // data se do RAM od zadané adresy nevejdou
@@ -153,21 +149,27 @@ public class Data2tap {
         log.info("address = " + address);
         log.info("dataLength = " + rawData.length);
         
-        tapHeader = new TapHeader();
-        log.info("assemble tap header");
-        tapHeader.setZxModel(model);
-        tapHeader.setType(tapBlockType);
-        tapHeader.setName(name);
-        tapHeader.setDataLength(rawData.length);
-        tapHeader.setParam1(address);
-        tapHeader.createData();
-        log.info("assemble tap header ... OK");
-        
-        log.info("assemble tap body");
-        tapBody = new TapBody(rawData.length);
-        tapBody.append(rawData);
-        tapBody.appendParityToLastByte();
-        log.info("assemble tap body ... OK");        
+        try {
+            tapHeader = new TapHeader();
+            log.info("assemble tap header");
+            tapHeader.setZxModel(model);
+            tapHeader.setType(tapBlockType);
+            tapHeader.setName(name);
+            tapHeader.setDataLength(rawData.length);
+            tapHeader.setParam1(address);
+            tapHeader.createData();
+            log.info("assemble tap header ... OK");
+
+            log.info("assemble tap body");
+            tapBody = new TapBody(rawData.length);
+            tapBody.append(rawData);
+            tapBody.appendParityToLastByte();
+            log.info("assemble tap body ... OK");     
+            
+        } catch (IllegalArgumentException ex) {
+            log.warn(ex.getMessage());
+            throw new InvalidDataException("invalid data", ex);
+        }
     }
 
     /**

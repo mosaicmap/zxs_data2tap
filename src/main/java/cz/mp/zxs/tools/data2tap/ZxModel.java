@@ -17,7 +17,6 @@ import java.util.List;
  */
 public abstract class ZxModel {
 
-    //  TODO test
     private String name;
     
     /**

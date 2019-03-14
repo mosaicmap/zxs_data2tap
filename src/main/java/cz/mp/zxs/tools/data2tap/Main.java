@@ -8,7 +8,10 @@
 package cz.mp.zxs.tools.data2tap;
 
 import static cz.mp.zxs.tools.data2tap.Version.VERSION;
-import cz.mp.zxs.tools.data2tap.gui.MainFrame;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,31 +38,16 @@ public class Main {
 //    }
 
     /** */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         log.info("version: " + VERSION);
 
-//        boolean optVersion = false;
-//
-//        for(int i = 0; i < args.length; i++) {
-//            String opt = args[i].trim().toLowerCase();
-//            if (opt.equals("--version")) {
-//                optVersion = true;
-//            }
-//        }
-//        if (optVersion) {
-//            printVersion();
-//            System.exit(0);
-//        }
-//
-//        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                log.info("create and show GUI");
-//                MainFrame.getInstance().setVisible(true);
-//            }
-//        });
-
+//        Files.write(new File("random_data_1.bin").toPath(), new byte[]{48, 49, 50, 51, 52},
+//                StandardOpenOption.CREATE_NEW,
+//                StandardOpenOption.WRITE,
+//                StandardOpenOption.TRUNCATE_EXISTING);
+        
         new Data2tapCli().executeWithArgs(args);
+        
     }
 
 }   // Main.java

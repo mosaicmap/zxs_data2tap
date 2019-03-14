@@ -264,7 +264,7 @@ public class Data2tapCli {
     }
     
     /**
-     * Obsluží parametry pro ovládání programu z CLI.
+     * Obslouží parametry pro ovládání programu z CLI.
      */
     private void executeCliOpts() {
         log.info("");

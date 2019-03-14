@@ -402,7 +402,6 @@ public class MainFrame {
             public void actionPerformed(ActionEvent e) {
                 log.debug("(createTapBtn click)");
                 
-                // TODO createTapFileWithDialogs -> Data2tap
                 createTapFileWithDialogs();
             }
         });

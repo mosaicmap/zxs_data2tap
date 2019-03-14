@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class TapHeaderTest {
 
     @Test
-    public void testTapHeader() {
+    public void testCreateData() {
         TapHeader tapHeader = new TapHeader();
         tapHeader.setType(TapBlockType.BINARY_DATA);
         tapHeader.setName("test");
