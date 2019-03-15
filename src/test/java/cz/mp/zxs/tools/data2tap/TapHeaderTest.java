@@ -13,7 +13,6 @@ import static org.junit.Assert.*;
 /**
  *
  * @author Martin Pokorný
- * @version 0.1
  */
 public class TapHeaderTest {
 

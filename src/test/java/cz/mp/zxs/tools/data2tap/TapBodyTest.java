@@ -13,10 +13,25 @@ import static org.junit.Assert.*;
 /**
  *
  * @author Martin Pokorný
- * @version 0.1
  */
 public class TapBodyTest {
     
+    @Test
+    public void testIsFullAndAppend() {
+        TapBody tapBody = new TapBody(4);
+        assertFalse(tapBody.isFull());
+        tapBody.append((byte) 0xFE, (byte) 0xEF);
+        assertFalse(tapBody.isFull());
+        tapBody.append((byte) 0x67, (byte) 0x13);
+        assertTrue(tapBody.isFull());
+    }
+        
+    @Test
+    public void testGetRawSize() {
+        TapBody tapBody = new TapBody(4);
+        assertEquals(4, tapBody.getRawDataSize());
+    }
+
     @Test
     public void testAppendAndAppendParity() {
         TapBody tapBody = new TapBody(8);
