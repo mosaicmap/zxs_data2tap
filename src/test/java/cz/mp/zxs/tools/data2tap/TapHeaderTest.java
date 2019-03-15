@@ -7,6 +7,7 @@
 
 package cz.mp.zxs.tools.data2tap;
 
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -16,6 +17,16 @@ import static org.junit.Assert.*;
  */
 public class TapHeaderTest {
 
+    @Test
+    public void testCheckName() {
+        Assert.assertTrue(TapHeader.checkName("01"));
+        Assert.assertTrue(TapHeader.checkName("Abc Abc 9-"));
+        Assert.assertTrue(TapHeader.checkName(""));
+        Assert.assertTrue(TapHeader.checkName("\\/-.,;\"\'"));
+        Assert.assertFalse(TapHeader.checkName("ň"));
+        Assert.assertFalse(TapHeader.checkName("opqamopqamZ"));
+    }
+    
     @Test
     public void testCreateData() {
         TapHeader tapHeader = new TapHeader();
@@ -53,5 +64,6 @@ public class TapHeaderTest {
         //tapHeader.createData();
         tapHeader.getBytes();   // bez createData() -> IllegalStateException
     }
+
     
 }   // TapHeaderTest.java
