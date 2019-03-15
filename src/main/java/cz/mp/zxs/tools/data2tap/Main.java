@@ -16,7 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code data2tap} pro ZX Spectrum převádí zadáná data na TAP soubor.
+ * {@code data2tap} převádí zadáná binární data na TAP soubor ve formátu 
+ * pro ZX Spectrum.
  * <p>
  * Výsledný TAP lze spojit s jinými TAP soubory 
  * (např. s TAP s 'loaderem' v Basicu)
@@ -32,22 +33,11 @@ public class Main {
         log = LoggerFactory.getLogger(Main.class);
     }
     
-//    /** */
-//    private static void printVersion() {
-//        System.out.println(VERSION);
-//    }
-
     /** */
     public static void main(String[] args) throws IOException {
         log.info("version: " + VERSION);
 
-//        Files.write(new File("random_data_1.bin").toPath(), new byte[]{48, 49, 50, 51, 52},
-//                StandardOpenOption.CREATE_NEW,
-//                StandardOpenOption.WRITE,
-//                StandardOpenOption.TRUNCATE_EXISTING);
-        
         new Data2tapCli().executeWithArgs(args);
-        
     }
 
 }   // Main.java

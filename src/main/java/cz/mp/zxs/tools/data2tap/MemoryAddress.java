@@ -10,13 +10,18 @@ package cz.mp.zxs.tools.data2tap;
 /**
  *
  * @author Martin Pokorný
- * @version 0.1
  */
 public enum MemoryAddress {
+    /** Začátek RAM po ROM. 16384 (0x4000). */
     ZXS_RAM_BEGINING(16384, "0x4000", "0x4000  RAM Begining"),
+    /** Oblast video paměti. Po bitové mapě následuje oblast atributů. */
     SCREEN(16384, "0x4000", "0x4000  Screen memory"),
+    /** Oblast atributů ve video paměti. */
     SCREEN_ATTRIBS(22528, "0x5B00", "0x5800  Screen memory Attributes"),
+    /** Print buffer. Pokud se nebude tisknout, lze využívat, třeba pro 
+     * rutiny ve strojovém kódu */
     PRINT_BUFFER(23296, "0x4000", "0x5B00  Printer Buffer"),
+
     UDG_16K(32600, "0x7F58", "0x7F58  UDG"),
     P_RAMT_16K(32767, "0x7FFF", "0x7FFF  P_RAMT"),
     UDG_48K(65368, "0xFF58", "0xFF58  UDG"),

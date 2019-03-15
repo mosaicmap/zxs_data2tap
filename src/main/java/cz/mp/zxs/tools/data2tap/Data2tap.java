@@ -13,9 +13,19 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO komentáře
 /**
- * 
+ * Převádí zadáná binární data na TAP soubor ve formátu pro ZX Spectrum.
+ * <p>
+ * Viz popis TAP souboru, např:<ul>
+ * <li><a href="https://faqwiki.zxnet.co.uk/wiki/TAP_format">TAP format na ZXS FAQ Wiki</a>,</li>
+ * <li><a href="http://faqwiki.zxnet.co.uk/wiki/Spectrum_tape_interface">tape format na ZXS FAQ Wiki</a></li>
+ * <li><a href="http://www.zx-modules.de/fileformats/tapformat.html">TAP format</a></li>
+ * </ul><p>
+ * Viz též knihy: <ul>
+ * <li><i><b>ZX ROM II - poznámky [CZ] -- Daniel Jenne</b></i> (kapitoly 2, 3, 4)</li>
+ * <li><i>Understanding Your Spectrum [EN] -- Ian Logan</i> (strany 14, 17, 32)</li>
+ * <li><i>Rutiny ROM ZX Spectrum [CZ] -- Jan Šritter, Marcel Dauth</i> (tabulka 6 na str. 21)</li>
+ * </ul>
  *
  * @author Martin Pokorný
  * @see ZxModel
@@ -45,7 +55,7 @@ public class Data2tap {
     private TapHeader tapHeader;
     private TapBody tapBody;
     
-    /** Soubor, kam se uloží vytvořený TAP. */
+    /** Cílový TAP soubor. */
     private File outTapFile;
         
     /** */
@@ -98,12 +108,13 @@ public class Data2tap {
      * Sestaví a uloží TAP zoubor ze zadaných dat.
      * <p>
      * Volat až po zadání všech dat. 
-     * Je potřeba zavolat minimálně: 
+     * Před zavoláním této metody je potřeba zavolat minimálně: 
      * {@linkplain #setAddress(int)},
-     * {@link #setRawData(byte[])},
+     * {@linkplain #setRawData(byte[])},
      * {@linkplain #setOutTapFile(java.io.File)},
      * <p>
-     * Defaultně je nastaven model {@linkplain ZxModelSpectrum48k}
+     * Defaultně je nastaven model {@linkplain ZxModelSpectrum48k}. 
+     * Jméno bloku je defaultně prázdné.
      * <p>
      * 
      * @throws IllegalStateException
@@ -173,7 +184,6 @@ public class Data2tap {
     }
 
     /**
-     * 
      * Volat po {@linkplain #buildTapHeaderAndBody() }.
      * 
      * @throws IllegalStateException 

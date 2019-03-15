@@ -33,7 +33,7 @@ public class TapBody {
     /** délka samotných dat. */
     private int rawDataSize;
     
-    private byte parity = flag;    // počítá se
+    private byte parity = flag;    //parita se počítá průběžně v této třídě
     
     /**
      * 
@@ -72,8 +72,11 @@ public class TapBody {
     }
     
     /**
+     * Přidá do těla zadaná binární data. (Parita se touto metodou nepřidává.)
      * 
      * @param value 
+     * @see #append(byte...) 
+     * @see #appendParityToLastByte() 
      */
     public void append(byte value) {
         bodyData[idx++] = value;
@@ -85,8 +88,10 @@ public class TapBody {
     }
 
     /**
+     * Přidá do těla zadaná binární data. (Parita se touto metodou nepřidává.)
      * 
      * @param values
+     * @see #appendParityToLastByte() 
      */
     public void append(byte... values) {
         for(int i=0; i<values.length; i++) {
@@ -96,7 +101,7 @@ public class TapBody {
     }
     
     /**
-     * 
+     * Po přidání všech dat zavolat tuto metodu pro přidání parity.
      */
     public void appendParityToLastByte() {
         if (bodyData.length == 0) {

@@ -108,7 +108,9 @@ public class TapHeader {
     /**
      * 
      * @param name
-     * @return 
+     * @return {@code false}, pokud jméno obsahuje nepovolené znaky nebo je
+     *      moc dlouhé; jinak {@code true}
+     * @throws IllegalArgumentException
      */
     public static boolean checkName(String name) {
         if (name == null) {
@@ -131,13 +133,8 @@ public class TapHeader {
      * @param ch
      * @return 
      */
-    private static boolean isGoogCharacterInName(char ch) {
-        return (Character.isLetterOrDigit(ch) 
-                || ch == ' ' || ch == '_' 
-                || ch == '+' || ch == '-' 
-                || ch == '.' || ch == ',' || ch == ';')
-                && 
-                (ch >= 0x20 || ch <= 0x7F);
+    private static final boolean isGoogCharacterInName(char ch) {
+        return ch >= 0x20 && ch <= 0x7F;
     }
     
     /**
@@ -288,6 +285,7 @@ public class TapHeader {
     }
     
     /**
+     * Z 2B vrátí ten méně významný Byte.
      * 
      * @param value
      * @return 
@@ -297,6 +295,7 @@ public class TapHeader {
     }
 
     /**
+     * Z 2B vrátí ten významnější Byte.
      * 
      * @param value
      * @return 

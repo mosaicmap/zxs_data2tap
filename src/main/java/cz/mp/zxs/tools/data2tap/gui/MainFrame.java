@@ -765,6 +765,8 @@ public class MainFrame {
     /**
      * Ze všech zadaných dat Sestaví TAP soubor.
      * Zobrazí všechny potřebné dialogy.
+     * <p>
+     * viz též {@linkplain Data2tapCli#executeCliOpts()}.
      */
     private void createTapFileWithDialogs() {
         log.info("");

@@ -28,7 +28,23 @@ import org.slf4j.LoggerFactory;
 
 /**
  * CLI (Command Line Interface) pro {@code Data2tap}.
- * 
+ * <p>
+ * viz definici parametrů v kódu metody {@linkplain #createOptions() }. 
+ * Stručně:
+ * <tt><pre>
+ * základní info (mají nejvyšší prioritu)
+ *      --help
+ *      --version
+ * GUI (má přednost před volbami pro CLI ovládání)
+ *      --gui
+ * parametry pro ovládání z CLI
+ *      -s title
+ *      -a adress
+ *          - povinný
+ *      -i input_binary_file 
+ *          - povinný
+ *      -o out_tap_file
+ * </pre></tt>
  * @author Martin Pokorný
  */
 public class Data2tapCli {
@@ -119,18 +135,9 @@ public class Data2tapCli {
         System.exit(errCode);
     }
     
-    // TODO komentáře ...
-//    --help
-//    --version
-//    --gui
-//    
-//    -a adress
-//        - kontrola  0x4000-0xFFFE
-//    -s title
-//        - kontrola  max 10 znaků
-//    -i input_binary_file 
-//    -o out_tap_file
-            
+    /**
+     * 
+     */
     private void createOptions() {
         Option help = Option.builder("h")
                 .longOpt("help")
@@ -192,6 +199,7 @@ public class Data2tapCli {
      * @param args 
      */
     private void parseArgs(String[] args) {
+        log.info("");
         try {
             CommandLineParser parser = new DefaultParser();
             
@@ -265,6 +273,8 @@ public class Data2tapCli {
     
     /**
      * Obslouží parametry pro ovládání programu z CLI.
+     * <p>
+     * viz též {@linkplain MainFrame#createTapFileWithDialogs()}.
      */
     private void executeCliOpts() {
         log.info("");
@@ -374,10 +384,10 @@ public class Data2tapCli {
             executeInfoOptsAndExit();
             System.exit(RESULT_OK);
         }
-        else if (optGui) {   // --gui má přednost před volbami pro Cli rozhraní
+        else if (optGui) {   // --gui má přednost před volbami pro CLI rozhraní
             executeGuiOpt();
         }
-        else {  // cli rozhraní
+        else {
             executeCliOpts();
             System.exit(RESULT_OK);
         }
