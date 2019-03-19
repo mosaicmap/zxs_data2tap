@@ -32,7 +32,7 @@ public class FileDialogBuilder {
         log.debug("");
         JFileChooser fileChooser = new JFileChooser();
         
-        ExtFileFilter scrExtFileFilter = new ExtFileFilter(getLocText("gui.file_dialog.filetype.tap"), "scr");
+        ExtFileFilter scrExtFileFilter = new ExtFileFilter(getLocText("gui.file_dialog.filetype.scr"), "scr");
         fileChooser.addChoosableFileFilter(scrExtFileFilter);
         ExtFileFilter binExtFileFilter = new ExtFileFilter(getLocText("gui.file_dialog.filetype.bin"), "bin");
         fileChooser.addChoosableFileFilter(binExtFileFilter);

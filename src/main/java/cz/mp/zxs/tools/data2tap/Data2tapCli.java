@@ -24,7 +24,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import static cz.mp.utils.TextSource.*;
 
 /**
  * CLI (Command Line Interface) pro {@code Data2tap}.
@@ -81,16 +81,16 @@ public class Data2tapCli {
      */
     private void printHelp() {
         log.info("");
-        pout("Converts data file to ZX Spectrum TAP file.");
-        pout("Usage:");
+        pout(getLocText("cli.help.intro"));
+        pout(getLocText("cli.help.usage") + ":");
         pout("  java -jar zxs_data2tap.jar [options...]");
-        pout("Options:");
+        pout(getLocText("cli.help.options") + ":");
         StringWriter sw = new StringWriter();
         helpFormatter.printOptions(new PrintWriter(sw), 79, options, 2, 2);
         poutNoEol(sw.toString());
-        pout("Examples:");
+        pout(getLocText("cli.help.examples") + ":");
         pout("  java -jar zxs_data2tap.jar --gui");
-        pout("  java -jar zxs_tap2bas.jar -i img.scr -a 0x4000 -s screen -o img.tap");
+        pout("  java -jar zxs_data2tap.jar -i img.scr -a 0x4000 -s screen -o img.tap");
     }
     
     /**
@@ -120,7 +120,7 @@ public class Data2tapCli {
      */
     private static void exitWithError(String msg, int errCode) {
         log.error("Error: " + msg);
-        pout("Error: " + msg);
+        pout(getLocText("error") + ": " + msg);
         System.exit(errCode);
     }
     
@@ -131,7 +131,7 @@ public class Data2tapCli {
      */
     private static void exitWithError(Exception ex, int errCode) {
         log.error("Error: " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
-        pout("Error: " + ex.getClass().getName() + ": " + ex.getMessage());
+        pout(getLocText("error") + ": " + ex.getClass().getName() + ": " + ex.getMessage());
         System.exit(errCode);
     }
     
@@ -143,7 +143,7 @@ public class Data2tapCli {
                 .longOpt("help")
                 .hasArg(false)
                 .required(false)
-                .desc("prints this help and exit")
+                .desc(getLocText("cli.help.opt.help"))
                 .build();
         options.addOption(help);
         
@@ -151,7 +151,7 @@ public class Data2tapCli {
                 .longOpt("version")
                 .hasArg(false)
                 .required(false)
-                .desc("prints version number and exit")
+                .desc(getLocText("cli.help.opt.version"))
                 .build();
         options.addOption(version);
 
@@ -159,21 +159,21 @@ public class Data2tapCli {
                 .longOpt("gui")
                 .hasArg(false)
                 .required(false)
-                .desc("runs GUI")
+                .desc(getLocText("cli.help.opt.gui"))
                 .build();
         options.addOption(gui);
-        
+
         Option inFileName = Option.builder("i")
                 .hasArg(true)
                 .required(false)
-                .desc("input DATA file name. Mandatory.")
+                .desc(getLocText("cli.help.opt.i"))
                 .build();
         options.addOption(inFileName);
 
         Option outFileName = Option.builder("o")
                 .hasArg(true)
                 .required(false)
-                .desc("output TAP file name. Mandatory.")
+                .desc(getLocText("cli.help.opt.o"))
                 .build();
         options.addOption(outFileName);
 
@@ -181,7 +181,7 @@ public class Data2tapCli {
                 .longOpt("address")
                 .hasArg(true)
                 .required(false)
-                .desc("dest. address in RAM. Accept decimal and hexadecimal numbers. Mandatory.")
+                .desc(getLocText("cli.help.opt.address"))
                 .build();
         options.addOption(adress);
         
@@ -189,7 +189,7 @@ public class Data2tapCli {
                 .longOpt("name")
                 .hasArg(true)
                 .required(false)
-                .desc("block title. Max 10 characters.")
+                .desc(getLocText("cli.help.opt.name"))
                 .build();
         options.addOption(title);
     }
@@ -282,32 +282,31 @@ public class Data2tapCli {
         // 1. --- získání hodnot a dat z parametrů + předvalidace
                 
         if (optInputDataFileName == null) {
-            exitWithError("Input DATA file name not defined. Option -i is mandatory.", RESULT_ERR_OPTS);          
+            exitWithError(getLocText("cli.err.missing_i"), RESULT_ERR_OPTS);          
         }
         if (optOutTapFileName == null) {
-            exitWithError("Output TAP file name not defined. Option -o is mandatory.", RESULT_ERR_OPTS);          
+            exitWithError(getLocText("cli.err.missing_o"), RESULT_ERR_OPTS);          
         }
         if (optName.length() > TapHeader.NAME_LEN) {
-            exitWithError("Name is too long.", RESULT_ERR_OPTS);          
+            exitWithError(getLocText("cli.err.name_too_long"), RESULT_ERR_OPTS);                      
         }
         
         // - optAdress --> address
         int address = -1;
         try {
             if (optAdress == null) {
-                exitWithError("Adress not defined. Option -a is mandatory.", RESULT_ERR_OPTS);
+                exitWithError(getLocText("cli.err.missing_a"), RESULT_ERR_OPTS);
             }
             address = MemoryAddress.addressToInt(optAdress);
             log.debug("address = " + address);
         } catch (NumberFormatException ex) {
-            exitWithError("Adress is not a valid number.", RESULT_ERR_OPTS);
+            exitWithError(getLocText("cli.err.address_not_a_number"), RESULT_ERR_OPTS);
         }
 
         // - optInputDataFileName --> byte[]
         File inFile = new File(optInputDataFileName);
         if (!inFile.exists() || inFile.isDirectory()) {
-            exitWithError("Input file " + optInputDataFileName + " doesn't exist", 
-                    RESULT_ERR_OPTS);          
+            exitWithError(getLocText("cli.err.i_file_not_found", optInputDataFileName), RESULT_ERR_OPTS);
         }
         
         byte[] inputFileContent = new byte[]{};
@@ -321,8 +320,7 @@ public class Data2tapCli {
         }
 
         if (inputFileContent.length == 0) {
-            exitWithError("Input file " + optInputDataFileName + " is empty", 
-                    RESULT_ERR_OPTS);
+            exitWithError(getLocText("cli.err.i_file_empty", optInputDataFileName), RESULT_ERR_OPTS);
         }
         
         // - optOutTapFileName -- kontrola přípany, pokud soubor existuje
@@ -331,9 +329,7 @@ public class Data2tapCli {
         File outTapFile = new File(optOutTapFileName);
         if (! outFileExt.toLowerCase().equals("tap")
                 && outTapFile.exists() && outTapFile.isFile()) {
-            exitWithError("Overwriting files with extension different from "
-                    + "\"tap\" is forbidden.", 
-                    RESULT_ERR_OPTS);                
+            exitWithError(getLocText("cli.err.o_overwriting_non_tap"), RESULT_ERR_OPTS);                
         }
          
         // -------------
@@ -355,8 +351,8 @@ public class Data2tapCli {
             if (outTapFile.exists() && outTapFile.isFile()) {
                 log.info(outTapFile.getName() + " successfully created");
                 log.info("Data size = " + inputFileContent.length + " B");
-                log.info("File size = " + outTapFile.length() + " B");
-                pout(outTapFile.getName() + " successfully created");
+                log.info("File size = " + outTapFile.length() + " B");                
+                pout(getLocText("cli.ok.outfile_created", outTapFile.getName()));
                 pout("Data size = " + inputFileContent.length + " B");
                 pout("File size = " + outTapFile.length() + " B");
             }

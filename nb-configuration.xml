@@ -12,6 +12,7 @@ Without this configuration present, some functionality in the IDE may be limited
             <configuration id="-h" profiles=""/>
             <configuration id="-i Exolon.scr -a 16384 -o Exolon.scr.tap" profiles=""/>
             <configuration id="-v" profiles=""/>
+            <configuration id="-Duser.language=en --gui" profiles=""/>
         </configurations>
     </config-data>
 </project-shared-configuration>

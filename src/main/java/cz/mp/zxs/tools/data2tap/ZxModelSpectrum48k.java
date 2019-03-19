@@ -26,7 +26,7 @@ public class ZxModelSpectrum48k extends ZxModel {
             
     /** */
     private ZxModelSpectrum48k() {
-        super("ZX Spectrum 48K  nebo  ZX Spectrum+");
+        super("ZX Spectrum 48K | ZX Spectrum+");
         
         ArrayList<MemoryAddress> list = 
                 new ArrayList<MemoryAddress>(10);
