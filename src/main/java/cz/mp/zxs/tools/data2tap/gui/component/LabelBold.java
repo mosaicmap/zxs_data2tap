@@ -19,6 +19,10 @@ import javax.swing.UIManager;
  */
 public class LabelBold extends JLabel {
 
+    private static final Font DEFAULT_LABEL_FONT = UIManager.getFont("Label.font");
+    private static final Font BOLD_LABEL_FONT = DEFAULT_LABEL_FONT.deriveFont(
+            DEFAULT_LABEL_FONT.getStyle() | Font.BOLD);    
+    
     public LabelBold(String text) {
         super(text);
         initFont();
@@ -49,14 +53,11 @@ public class LabelBold extends JLabel {
         initFont();
     }
 
-    private static Font defaultLabelFont = UIManager.getFont("Label.font");
-    private static Font labelFont = defaultLabelFont.deriveFont(
-            defaultLabelFont.getStyle() | Font.BOLD);    
     /**
      * 
      */
     private void initFont() {
-        setFont(labelFont);
+        setFont(BOLD_LABEL_FONT);
     }       
     
 }   // LabelBold.java

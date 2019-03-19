@@ -17,8 +17,8 @@ import javax.swing.JList;
 /**
  *
  * @author Martin Pokorný
- * @version 0.1
  * @see MemoryAddressItem
+ * @see MainFrame
  */
 public class MemoryAddressCellRenderer extends DefaultListCellRenderer {
 

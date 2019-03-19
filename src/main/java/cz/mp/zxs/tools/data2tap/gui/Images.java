@@ -7,7 +7,6 @@
 
 package cz.mp.zxs.tools.data2tap.gui;
 
-import cz.mp.zxs.tools.data2tap.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +16,10 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- *
+ * Definice obrázků pro GUI.
+ * 
  * @author Martin Pokorný
+ * @see MainFrame
  */
 public class Images {
     private static final Logger log = LoggerFactory.getLogger(Images.class);

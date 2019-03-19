@@ -8,10 +8,7 @@
 package cz.mp.zxs.tools.data2tap;
 
 import static cz.mp.zxs.tools.data2tap.Version.VERSION;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

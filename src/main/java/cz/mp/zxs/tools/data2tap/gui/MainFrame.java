@@ -86,10 +86,6 @@ public class MainFrame {
 
     private ZxModel selectedZxModel;
         
-//gui.mainframe.type.tooltip=
-//gui.mainframe.name.tooltip=
-//gui.mainframe.address.tooltip=
-        
     private LabelBold typeLabel = new LabelBold(getLocText("gui.mainframe.type"));
     private JComboBox typeCombo = new JComboBox();
 
@@ -806,7 +802,7 @@ public class MainFrame {
         data2tap.setAddress(address);
         data2tap.setRawData(inputFileContent);
         data2tap.setOutTapFile(outTapFile);
-//        
+        
         try {
             data2tap.execute();
 

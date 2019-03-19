@@ -1,15 +1,8 @@
 
 
-- JUnit testy 
-
 - GUI
 
     - hezčí ikona
 
-    ? zobrazovat velikost dat v poli data
-      jako label nebo needitovatelný field
-
-    - lokalizované texty ze souboru .properties (EN,CZ)
-
-
+- release  v0.2
     

@@ -12,7 +12,8 @@ package cz.mp.zxs.tools.data2tap;
  * Typ bloku v TAP souboru.
  *
  * @author Martin Pokorný
- * @see Tap2bas
+ * @see TapHeader 
+ * @see Data2tap
  */
 public enum TapBlockType {
     BASIC(0, "BASIC program"),

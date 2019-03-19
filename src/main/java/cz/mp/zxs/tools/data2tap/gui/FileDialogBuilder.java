@@ -17,6 +17,7 @@ import static cz.mp.utils.TextSource.*;
 /**
  *
  * @author Martin Pokorný
+ * @see MainFrame
  */
 public class FileDialogBuilder {
 
