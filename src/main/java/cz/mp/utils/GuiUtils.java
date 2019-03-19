@@ -5,7 +5,7 @@
  *  charset: UTF-8
  */
 
-package cz.mp.zxs.tools.data2tap.utils;
+package cz.mp.utils;
 
 import java.awt.Color;
 import java.awt.Dimension;

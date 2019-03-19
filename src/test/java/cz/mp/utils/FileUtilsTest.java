@@ -5,8 +5,9 @@
  *  charset: UTF-8
  */
 
-package cz.mp.zxs.tools.data2tap.utils;
+package cz.mp.utils;
 
+import cz.mp.utils.FileUtils;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
