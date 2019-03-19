@@ -7,7 +7,7 @@
 
 package cz.mp.zxs.tools.data2tap.misc;
 
-import cz.mp.zxs.tools.data2tap.utils.FileUtils;
+import cz.mp.utils.FileUtils;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
 

@@ -9,7 +9,7 @@ package cz.mp.zxs.tools.data2tap;
 
 import static cz.mp.zxs.tools.data2tap.Version.VERSION;
 import cz.mp.zxs.tools.data2tap.gui.MainFrame;
-import cz.mp.zxs.tools.data2tap.utils.FileUtils;
+import cz.mp.utils.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;

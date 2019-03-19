@@ -9,7 +9,7 @@ package cz.mp.zxs.tools.data2tap.gui;
 
 import cz.mp.zxs.tools.data2tap.Data2tap;
 import cz.mp.zxs.tools.data2tap.Data2tapCli;
-import cz.mp.zxs.tools.data2tap.utils.GuiUtils;
+import cz.mp.utils.GuiUtils;
 import cz.mp.zxs.tools.data2tap.InvalidDataException;
 import cz.mp.zxs.tools.data2tap.MemoryAddress;
 import cz.mp.zxs.tools.data2tap.TapBlockType;
@@ -18,7 +18,8 @@ import cz.mp.zxs.tools.data2tap.ZxModel;
 import cz.mp.zxs.tools.data2tap.ZxModelSpectrum16k;
 import cz.mp.zxs.tools.data2tap.ZxModelSpectrum48k;
 import cz.mp.zxs.tools.data2tap.gui.component.LabelBold;
-import cz.mp.zxs.tools.data2tap.utils.FileUtils;
+import cz.mp.utils.FileUtils;
+import cz.mp.utils.StandardDialogsLocaliser;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -58,7 +59,7 @@ import javax.swing.text.MaskFormatter;
 import javax.swing.undo.UndoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import static cz.mp.utils.TextSource.*;
 
 /**
  * Hlavní okno nástroje {@code data2tap} pro ZX Spectrum.
@@ -79,37 +80,40 @@ public class MainFrame {
 
     private static MainFrame instance = null;
 
-    private LabelBold modelLabel = new LabelBold("Model");
+    
+    private LabelBold modelLabel = new LabelBold(getLocText("gui.mainframe.model"));
     private JComboBox modelCombo = new JComboBox();
 
     private ZxModel selectedZxModel;
         
-    private LabelBold typeLabel = new LabelBold("Type");
+//gui.mainframe.type.tooltip=
+//gui.mainframe.name.tooltip=
+//gui.mainframe.address.tooltip=
+        
+    private LabelBold typeLabel = new LabelBold(getLocText("gui.mainframe.type"));
     private JComboBox typeCombo = new JComboBox();
 
-    private LabelBold nameLabel = new LabelBold("Name");
+    private LabelBold nameLabel = new LabelBold(getLocText("gui.mainframe.name"));
     private JFormattedTextField nameField = new JFormattedTextField();
 
-    private LabelBold addressLabel = new LabelBold("Address");
+    private LabelBold addressLabel = new LabelBold(getLocText("gui.mainframe.address"));
     private JComboBox addressCombo = new JComboBox();
-//    private JLabel adressInfoLabel = new JLabel("16384 (0x4000) \u2013 65535 (0xFFFF)");
 
-    private LabelBold dataLabel = new LabelBold("Data");
-//    private JLabel dataLabel = new JLabel("Data");
+    private LabelBold dataLabel = new LabelBold(getLocText("gui.mainframe.data"));
 
     private JEditorPane dataTextArea = new JEditorPane();
     private JScrollPane dataScrollPane = new JScrollPane(dataTextArea);
     private UndoManager dataTextAreaUndoManager = new UndoManager();
 
-    private JLabel dataRadixLabel = new JLabel("Radix");
+    private JLabel dataRadixLabel = new JLabel(getLocText("gui.mainframe.data.radix"));
     private JComboBox dataRadixCombo = new JComboBox();
-            
-    private JButton loadDataBtn = new JButton("Load binary file");
+    
+    private JButton loadDataBtn = new JButton(getLocText("gui.mainframe.load_data"));   // Load binary file
     
     private Font monoBiggerFont = new Font("Monospaced", 
             Font.PLAIN, dataTextArea.getFont().getSize()+2);
             
-    private JButton createTapBtn = new JButton("Create TAP file");
+    private JButton createTapBtn = new JButton(getLocText("gui.mainframe.create_tap")); // Create TAP file
    
     private JTextField aboutSelectableLabel = new JTextField("");
 
@@ -132,6 +136,7 @@ public class MainFrame {
             initEventHandlers();
             initFrame();
             nameField.requestFocusInWindow();
+            StandardDialogsLocaliser.localize(MAIN);
             log.info("init done");
             log.info("selectedZxModel = " + selectedZxModel.getName());        
         } catch (Exception ex) {
@@ -169,7 +174,6 @@ public class MainFrame {
     private void initComponents() {
         log.debug("");
 
-//        modelCombo.setToolTipText("Used only for validation at this momemt");
         modelCombo.setEditable(false);
         
         ZxModel zxs16k = ZxModelSpectrum16k.get();
@@ -186,28 +190,13 @@ public class MainFrame {
         dataTextArea.setFont(monoBiggerFont);
         dataScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-//            ZXS 48k
-//        adressCombo.addItem(new MemoryAddressItem("16384","0x4000  Screen memory"));    // 6912 B; 6144 B bez atributů
-//        adressCombo.addItem(new MemoryAddressItem("22528","0x5800  Screen memory Attributes"));  // 768 B
-//      23552  (0x5C00 - System variables  182 B ? -- nesahat  
-//      23734 (0x5CB6) - Microdrive maps 
-//        adressCombo.addItem(new MemoryAddressItem("23296","0x5B00  Printer Buffer"));    // 256 B;  konec na 23552 0x5C00
-//        adressCombo.addItem(new MemoryAddressItem("65368","0xFF58  UDG"));   // 168 B
-                    
-//        adressCombo.addItem(new MemoryAddressItem("",""));
-//        adressCombo.addItem(new MemoryAddressItem("16384","0x4000  Screen memory"));    // 6912 B; 6144 B bez atributů
-//        adressCombo.addItem(new MemoryAddressItem("22528","0x5800  Screen memory Attributes"));  // 768 B
-//        adressCombo.addItem(new MemoryAddressItem("23296","0x5B00  Printer Buffer"));    // 256 B;  konec na 23552 0x5C00
-//        adressCombo.addItem(new MemoryAddressItem("65368","0xFF58  UDG"));   // 168 B
-        
         addressCombo.addItem("");
         for (MemoryAddress ma : selectedZxModel.getMemoryAdressSuggestions()) {
             addressCombo.addItem(ma);
         }
         addressCombo.setSelectedIndex(0);
         
-        addressCombo.setToolTipText("Enter decimal or hexadecimal number. "
-                + "Hexadecimal number i accepted in \"0x\" notation.");
+        addressCombo.setToolTipText(getLocText("gui.mainframe.address.tooltip"));
         addressCombo.setEditable(true);
         addressCombo.setRenderer(new MemoryAddressCellRenderer());
                 
@@ -221,7 +210,7 @@ public class MainFrame {
             log.error(ex.getMessage(),ex);
             nameField = new JFormattedTextField();
         }
-        nameField.setToolTipText("Max 10 characters");
+        nameField.setToolTipText(getLocText("gui.mainframe.name.tooltip"));
         
         dataRadixCombo.addItem(Radix.DECIMAL);
         dataRadixCombo.addItem(Radix.HEXADECIMAL);
@@ -273,14 +262,6 @@ public class MainFrame {
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX505, 0,0));
         r++;
         // ----
-//        JPanel headerSep = new JPanel(new GridBagLayout());
-//        headerSep.add(headerLabel, new GridBagConstraints(0,0,1,1,0.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.NONE, insX550, 0,0));
-//        headerSep.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(1,0,1,1,1.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0, 0));        
-//        c.add(headerSep, new GridBagConstraints(0,r,11,1,1.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins0000, 0,0));
-//        r++;
         c.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(0,r,11,1,1.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0,0));
         r++;
@@ -301,20 +282,9 @@ public class MainFrame {
                 GridBagConstraints.WEST, GridBagConstraints.NONE, ins5505, 0,0));
         c.add(addressCombo, new GridBagConstraints(1,r,1,1,0.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins5505, 0,0));
-//        c.add(adressInfoLabel, new GridBagConstraints(2,r,1,1,0.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.NONE, ins5505, 0,0));
         r++;
 
         // ----
-//        JPanel dataSep = new JPanel(new GridBagLayout());
-//        dataSep.add(dataLabel, new GridBagConstraints(0,0,1,1,0.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.NONE, insX550, 0,0));
-//        dataSep.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(1,0,1,1,1.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0, 0));        
-//        c.add(dataSep, new GridBagConstraints(0,r,11,1,1.0,0.0,
-//                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, ins0000, 0,0));
-//        r++;
-        
         c.add(new JSeparator(JSeparator.HORIZONTAL), new GridBagConstraints(0,r,11,1,1.0,0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insX555, 0,0));
         r++;
@@ -668,12 +638,11 @@ public class MainFrame {
      
         log.info(file.getName() + " loaded");
         JOptionPane.showMessageDialog(frame,
-                "<HTML><B>" + file.getName() + "</B> loaded.<BR>"
-                + "Size = " + data.length + " B", 
-                "",
+                getLocText("gui.mainframe.ok.data_loaded", file.getName(), data.length),
+                getLocText("success"),
                 JOptionPane.INFORMATION_MESSAGE);
     }
-            
+        
     /**
      * Kontroluje adresu zadanou v {@linkplain #addressCombo}.
      * Pokud je chybně, zobrazí dialog.
@@ -687,8 +656,8 @@ public class MainFrame {
         if (addressCombo.getSelectedItem().toString().trim().isEmpty()) {
             log.info("Address is mandatory");
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Address is mandatory",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                    getLocText("gui.mainframe.err.address_is_mandatory"),
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -699,18 +668,16 @@ public class MainFrame {
             if (! selectedZxModel.isValidAddress(address)) {
                 log.info("Illegal address " + address);
                 JOptionPane.showMessageDialog(MainFrame.this.frame,
-                        "Address must be from " 
-                        + selectedZxModel.getRamAddresMin() + " to " 
-                        + selectedZxModel.getRamAddresMax(), 
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                        getLocText("gui.mainframe.err.illegal_address", selectedZxModel.getRamAddresMin(), selectedZxModel.getRamAddresMax()),
+                        getLocText("error"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         } catch (NumberFormatException nex) {
             //log.warn("Wrong address number. " + nex.getMessage(), nex);
             log.warn("Wrong address number. " + nex.getMessage());
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Wrong address number (" + nex.getMessage() + ")",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                    getLocText("gui.mainframe.err.address_not_a_number"),
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         
@@ -746,7 +713,7 @@ public class MainFrame {
             if (tapFile.exists() && !tapFile.isDirectory()) {
                 log.info(tapFile.getName() + " exists. Overwrite?");
                 int res = JOptionPane.showConfirmDialog(MainFrame.this.frame,
-                        "<HTML><B>" + tapFile.getName() + "</B> already exists. Overwrite?", 
+                        getLocText("gui.mainframe.question.create_tap.overwrite"),
                         "", JOptionPane.YES_NO_OPTION);
                 if (res != JOptionPane.YES_OPTION) {
                     log.info("canceled");
@@ -776,7 +743,8 @@ public class MainFrame {
         if (name.length() > 10) {   // kvůli FormattedTextField by nemělo nikdy nastat 
             log.warn("name.length() > 10");
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Name is too long", "Error", JOptionPane.ERROR_MESSAGE);            
+                    getLocText("gui.mainframe.err.name_too_long"),
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);            
             return;
         }
         
@@ -789,8 +757,8 @@ public class MainFrame {
         } catch (NumberFormatException ex) {
             log.warn(ex.getMessage());
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Adress is not a valid number.", 
-                    "Error", JOptionPane.ERROR_MESSAGE);            
+                    getLocText("gui.mainframe.err.address_not_a_number"),                    
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);            
         }
         
         Radix selectedRadix = (Radix) dataRadixCombo.getSelectedItem();
@@ -803,21 +771,23 @@ public class MainFrame {
             //log.warn(idex.getMessage(), idex);
             log.warn(idex.getMessage());
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    idex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
+                    idex.getMessage(), 
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);            
             return;
         }
         if (inputFileContent.length == 0) {
             log.info("No input data");
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "No input data", "Error", JOptionPane.ERROR_MESSAGE);            
+                    getLocText("gui.mainframe.err.no_input_data"),
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);            
             return;
         }
 
         if (address + inputFileContent.length > selectedZxModel.getRamAddresMax()) {
             log.info("adress + inputData.length > " + selectedZxModel.getRamAddresMax());
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    "Data doesn't fit in RAM  (address + length of data > max address)",
-                    "Error", JOptionPane.ERROR_MESSAGE);                                  
+                    getLocText("gui.mainframe.err.data_too_long"),                    
+                    getLocText("error"), JOptionPane.ERROR_MESSAGE);                                  
             return;
         }
         
@@ -836,7 +806,7 @@ public class MainFrame {
         data2tap.setAddress(address);
         data2tap.setRawData(inputFileContent);
         data2tap.setOutTapFile(outTapFile);
-        
+//        
         try {
             data2tap.execute();
 
@@ -844,18 +814,17 @@ public class MainFrame {
                 log.info(outTapFile.getName() + " successfully created");
                 log.info("Data size = " + inputFileContent.length + " B");
                 log.info("File size = " + outTapFile.length() + " B");
-                log.debug("-----------------------");
+                log.debug("-----------------------");                
                 JOptionPane.showMessageDialog(frame,
-                        "<HTML><B>" + outTapFile.getName() + "</B> successfully created.<BR>"
-                        + "Data size = " + inputFileContent.length + " B.<br>"
-                        + "File size = " + outTapFile.length() + " B.",
-                        "Success", JOptionPane.INFORMATION_MESSAGE);                
+                        getLocText("gui.mainframe.ok.outfile_created", 
+                                outTapFile.getName(), inputFileContent.length, outTapFile.length()),
+                        getLocText("success"), JOptionPane.INFORMATION_MESSAGE);                
             }
             else {
                 log.warn(outTapFile.getName() + " doesn't exist");
                 JOptionPane.showMessageDialog(MainFrame.this.frame,
-                        "Unexpected failure. See log file for more details.", 
-                        "Error", JOptionPane.ERROR_MESSAGE); 
+                        getLocText("gui.mainframe.err.general.unexpected"), 
+                        getLocText("error"), JOptionPane.ERROR_MESSAGE); 
             }
         } catch (InvalidDataException | IOException ex) {
             log.warn(ex.getMessage(), ex);
@@ -936,8 +905,8 @@ public class MainFrame {
      * @see ChangeDataRadixItemListener
      */
     private enum Radix {
-        DECIMAL(10, "Decimal"),
-        HEXADECIMAL(16, "Hexadecimal"),
+        DECIMAL(10, getLocText("gui.mainframe.data.radix.decimal")),
+        HEXADECIMAL(16, getLocText("gui.mainframe.data.radix.hexadecimal")),
         ;
         
         int radix;
