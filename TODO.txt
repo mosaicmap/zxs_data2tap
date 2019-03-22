@@ -1,8 +1,4 @@
 
+- vylepšit Readme.md
 
-- GUI
-
-    - hezčí ikona
-
-- release  v0.2
-    
+- release v0.2

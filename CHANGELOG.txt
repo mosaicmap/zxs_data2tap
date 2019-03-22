@@ -1,0 +1,14 @@
+
+-----------------
+v0.2 (2019-?-?)
+
+- Internationalization + Localization: En, Cz
+- Added CLI
+- Code quality improvements
+- Minor GUI changes
+    - A bit better icon for main window; ComboBox Model; typos;
+
+-----------------
+v0.1 (2017-10-21)
+
+- First public release
