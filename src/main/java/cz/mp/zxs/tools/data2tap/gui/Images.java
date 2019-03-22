@@ -37,7 +37,7 @@ public class Images {
     private static Map<String, ImageIcon> images =
             new HashMap<String, ImageIcon>();
 
-//    public static final String ICON_16 = "icon_16.png";
+    public static final String ICON_16 = "icon_16.png";
     public static final String ICON_32 = "icon_32.png";
 //    public static final String ICON_64 = "icon_64.png";
 

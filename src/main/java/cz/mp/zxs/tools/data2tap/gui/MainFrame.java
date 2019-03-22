@@ -148,7 +148,7 @@ public class MainFrame {
         log.debug("");
 
         ArrayList<Image> icons = new ArrayList<Image>();
-        //icons.add(Images.getImage(Images.ICON_16).getImage());
+        icons.add(Images.getImage(Images.ICON_16).getImage());
         icons.add(Images.getImage(Images.ICON_32).getImage());
         //icons.add(Images.getImage(Images.ICON_64).getImage());
         frame.setIconImages(icons);
