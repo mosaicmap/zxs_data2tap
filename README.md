@@ -24,7 +24,7 @@ Note: This tool isn't designed to convert BASIC source code to the TAP file. For
 6. wait until *maven* download all dependencies and plugins. Then *maven* will create build.
 7. result should be in directory: *target/dist-package*
 
-- Note: Or instead of steps 2 - 5 you can simply run this command:  `mvn package`
+- Note: instead of steps 2, 3, 5 you can simply run this command:  `mvn package`
 
 ### Run
 

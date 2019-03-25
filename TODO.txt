@@ -1,4 +1,0 @@
-
-- vylepšit Readme.md
-
-- release v0.2
