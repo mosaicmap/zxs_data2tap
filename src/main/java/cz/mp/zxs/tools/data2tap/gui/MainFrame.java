@@ -82,12 +82,12 @@ public class MainFrame {
 
     
     private LabelBold modelLabel = new LabelBold(getLocText("gui.mainframe.model"));
-    private JComboBox modelCombo = new JComboBox();
+    private JComboBox<ZxModel> modelCombo = new JComboBox<ZxModel>();
 
     private ZxModel selectedZxModel;
         
     private LabelBold typeLabel = new LabelBold(getLocText("gui.mainframe.type"));
-    private JComboBox typeCombo = new JComboBox();
+    private JComboBox<TapBlockType> typeCombo = new JComboBox<TapBlockType>();
 
     private LabelBold nameLabel = new LabelBold(getLocText("gui.mainframe.name"));
     private JFormattedTextField nameField = new JFormattedTextField();
@@ -102,7 +102,7 @@ public class MainFrame {
     private UndoManager dataTextAreaUndoManager = new UndoManager();
 
     private JLabel dataRadixLabel = new JLabel(getLocText("gui.mainframe.data.radix"));
-    private JComboBox dataRadixCombo = new JComboBox();
+    private JComboBox<Radix> dataRadixCombo = new JComboBox<Radix>();
     
     private JButton loadDataBtn = new JButton(getLocText("gui.mainframe.load_data"));   // Load binary file
     

@@ -109,9 +109,9 @@ public class Data2tapCli {
         System.out.print(text);
     }
 
-    private static void perr(String text) {
-        System.err.println(text);
-    }
+    // private static void perr(String text) {
+    //     System.err.println(text);
+    // }
     
     /**
      * 

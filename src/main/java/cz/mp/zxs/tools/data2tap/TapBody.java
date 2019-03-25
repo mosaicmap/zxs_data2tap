@@ -56,6 +56,7 @@ public class TapBody {
      * @throws IllegalArgumentException
      */
     private void initImpl(int rawDataSize) {
+        log.debug("rawDataSize = " + rawDataSize);
         if (rawDataSize < 1) {
             throw new IllegalArgumentException("rawDataSize");
         }
@@ -64,6 +65,7 @@ public class TapBody {
         lenLsb = (byte) (len & 0xFF);
         lenMSB = (byte) ((len >> 8) & 0xFF);
         int bodyLen = rawDataSize + 4;  // 2 za len, 1 za flag, 1 za paritu
+        log.debug("bodyLen = " + bodyLen);
         bodyData = new byte[bodyLen];
         idx = 0;
         bodyData[idx++] = lenLsb;
