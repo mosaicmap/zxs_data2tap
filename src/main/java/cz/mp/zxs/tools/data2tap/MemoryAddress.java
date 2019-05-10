@@ -17,10 +17,12 @@ public enum MemoryAddress {
     /** Oblast video paměti. Po bitové mapě následuje oblast atributů. */
     SCREEN(16384, "0x4000", "Screen memory"),
     /** Oblast atributů ve video paměti. */
-    SCREEN_ATTRIBS(22528, "0x5B00", "Screen memory Attributes"),
+    SCREEN_ATTRIBS(22528, "0x5800", "Screen memory Attributes"),
     /** Print buffer. Pokud se nebude tisknout, lze využívat, třeba pro 
      * rutiny ve strojovém kódu */
-    PRINT_BUFFER(23296, "0x4000", "Printer Buffer"),
+    PRINT_BUFFER(23296, "0x5B00", "Printer Buffer"),
+    /** Systémové proměnné. */
+    SYS_VARS(23552, "0x5C00", "System Variables"),
 
     UDG_16K(32600, "0x7F58", "UDG"),
     P_RAMT_16K(32767, "0x7FFF", "P_RAMT"),
