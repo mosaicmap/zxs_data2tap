@@ -779,10 +779,10 @@ public class MainFrame {
             return;
         }
 
-        if (address + inputFileContent.length > selectedZxModel.getRamAddresMax()) {
-            log.info("adress + inputData.length > " + selectedZxModel.getRamAddresMax());
+        if (address + inputFileContent.length > selectedZxModel.getRamAddresMax() + 1) {
+            log.info("adress + inputData.length > " + selectedZxModel.getRamAddresMax() + 1);
             JOptionPane.showMessageDialog(MainFrame.this.frame,
-                    getLocText("gui.mainframe.err.data_too_long"),                    
+                    getLocText("gui.mainframe.err.data_too_long"),
                     getLocText("error"), JOptionPane.ERROR_MESSAGE);                                  
             return;
         }

@@ -147,7 +147,7 @@ public class Data2tap {
                     " is invalid for " + model.getName());
         }
         // data se do RAM od zadané adresy nevejdou
-        if (address + rawData.length > model.getRamAddresMax()) {
+        if (address + rawData.length > model.getRamAddresMax() + 1) {
             log.debug("address = " + address);
             log.debug("rawData.length = " + rawData.length);
             log.debug("model.getRamAddresMax() = " + model.getRamAddresMax());
