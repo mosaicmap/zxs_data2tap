@@ -51,6 +51,33 @@ public class Data2tapTest {
         }
     }
     
+    
+    @Test
+    public void testExecute_testMaxRam() {
+        // data_1.bin --- obsahuje 5 bytů
+        File data1InBin = new File("src/test/resources/files/data_1.bin");
+        
+        Data2tap data2tap = new Data2tap();
+        data2tap.setTapBlockType(TapBlockType.BINARY_DATA);
+        data2tap.setName("data_1");
+        data2tap.setModel(ZxModelSpectrum48k.get());
+        data2tap.setAddress(MemoryAddress.P_RAMT_48K.getAddress() - 5 + 1); // poslední adresový byte je platná adresa; 
+                
+        try {
+            byte[] inFileContent = Files.readAllBytes(data1InBin.toPath());
+            data2tap.setRawData(inFileContent);
+            
+            File tempOutFile = File.createTempFile("data_1_", ".tap");
+            tempOutFile.deleteOnExit();
+            data2tap.setOutTapFile(tempOutFile);            
+            
+            data2tap.execute();
+            
+        } catch (InvalidDataException | IOException ex) {            
+            Assert.fail(ex.getMessage());
+        }        
+    }
+    
     @Test(expected = InvalidDataException.class)
     public void testExecute_invalidData01() throws InvalidDataException {  
         Data2tap data2tap = new Data2tap();

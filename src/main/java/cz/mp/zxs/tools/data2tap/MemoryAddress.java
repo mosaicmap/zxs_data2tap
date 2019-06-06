@@ -27,7 +27,7 @@ public enum MemoryAddress {
     UDG_16K(32600, "0x7F58", "UDG"),
     P_RAMT_16K(32767, "0x7FFF", "P_RAMT"),
     UDG_48K(65368, "0xFF58", "UDG"),
-    P_RAMT_48K(65535, "0xFFFF", "P_RAMT"),
+    P_RAMT_48K(65535, "0xFFFF", "P_RAMT"),  // pozor, toto je platná adresa; velikost RAM je P_RAMT_48K+1
     ;
     
     int address;
