@@ -1,4 +1,10 @@
 
+
+-----------------
+v0.2.1 (2019-06-06)
+
+- bug fix (last byte...)
+
 -----------------
 v0.2 (2019-03-25)
 
@@ -6,7 +12,7 @@ v0.2 (2019-03-25)
 - Added CLI
 - Code quality improvements
 - Minor GUI changes
-    - A bit better icon for main window; ComboBox Model; typos; etc.
+    - A bit better icon for main window; ComboBox "Model"; typos; etc.
 
 -----------------
 v0.1 (2017-10-21)
