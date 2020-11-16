@@ -24,3 +24,6 @@ _tmp/
 _temp/
 _info_tmp/
 
+# IDE
+.project
+.classpath
